@@ -1,0 +1,30 @@
+{
+  "name": "tstocksbot",
+  "version": "1.0.0",
+  "description": "@TStocksBot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "lint": "node_modules/.bin/eslint --ext js .",
+    "lint:fix": "node_modules/.bin/eslint --fix --ext js ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LyoSU/TStocksBot.git"
+  },
+  "author": "LyoSU",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LyoSU/TStocksBot/issues"
+  },
+  "homepage": "https://t.me/TStocksBot",
+  "dependencies": {
+    "dotenv": "^6.2.0",
+    "telegraf": "^3.27.1"
+  },
+  "devDependencies": {
+    "@atomix/eslint-config": "^6.4.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.14.1"
+  }
+}
