@@ -1,0 +1,13 @@
+profile: |
+  <b>Имя:</b> ${name}
+  <b>Баланс:</b> ${balance}💲
+stock:
+  info: |
+    <b>${title}</b> (@${username})
+
+    <b>Символ:</b> $${symbol}
+    <b>Цена:</b> ${price}💲
+  error:
+    not_found: |
+      <b>Ошибка!</b>
+      Канал не найден

@@ -1,6 +1,6 @@
 {
   "name": "tstocksbot",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "@TStocksBot",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,11 @@
   "homepage": "https://t.me/TStocksBot",
   "dependencies": {
     "dotenv": "^6.2.0",
-    "telegraf": "^3.27.1"
+    "mongoose": "^5.4.15",
+    "mongoose-float": "^1.0.3",
+    "request": "^2.88.0",
+    "telegraf": "^3.27.1",
+    "telegraf-i18n": "^6.4.0"
   },
   "devDependencies": {
     "@atomix/eslint-config": "^6.4.0",
