@@ -22,8 +22,8 @@ const userSchema = mongoose.Schema({
 
 const User = mongoose.model('User', userSchema)
 
-User.dbUpdate = (ctx) => new Promise(async (resolve, reject) => {
-  let user = await User.findOne({ telegram_id: ctx.from.id }).catch(reject)
+User.get = async (ctx) => {
+  let user = await User.findOne({ telegram_id: ctx.from.id })
 
   if (!user) {
     user = new User()
@@ -35,9 +35,7 @@ User.dbUpdate = (ctx) => new Promise(async (resolve, reject) => {
   user.updatedAt = new Date()
   await user.save()
 
-  ctx.user = user
-
-  resolve(user)
-})
+  return user
+}
 
 module.exports = User

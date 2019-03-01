@@ -1,6 +1,6 @@
 {
   "name": "tstocksbot",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "@TStocksBot",
   "main": "index.js",
   "scripts": {
@@ -19,10 +19,15 @@
   },
   "homepage": "https://t.me/TStocksBot",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "cron": "^1.6.0",
+    "dateformat": "^3.0.3",
     "dotenv": "^6.2.0",
+    "ioredis": "^4.6.2",
     "mongoose": "^5.4.15",
     "mongoose-float": "^1.0.3",
     "request": "^2.88.0",
+    "request-promise": "^4.2.4",
     "telegraf": "^3.27.1",
     "telegraf-i18n": "^6.4.0"
   },
