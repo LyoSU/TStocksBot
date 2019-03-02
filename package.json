@@ -19,6 +19,8 @@
   },
   "homepage": "https://t.me/TStocksBot",
   "dependencies": {
+    "chart.js": "^2.7.3",
+    "chartjs-node-canvas": "^2.0.1",
     "cheerio": "^1.0.0-rc.2",
     "cron": "^1.6.0",
     "dateformat": "^3.0.3",
