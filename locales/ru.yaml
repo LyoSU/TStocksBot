@@ -3,13 +3,10 @@ profile: |
   <b>Баланс:</b> ${balance}💲
 stock:
   info: |
-    <b>${title}</b> (@${username})
+    <a href="${chart}">&#8203;</a><b>${title}</b> (@${username})
 
     <b>Символ:</b> $${symbol}
     <b>Цена:</b> ${price}💲
-
-    <b>История:</b>
-    ${priceHistory}
   error:
     small: |
       <b>Ошибка!</b>

@@ -1,85 +1,82 @@
 const dateFormat = require('dateformat')
-const request = require('request-promise')
-const fs = require('fs')
-const stream = require('stream')
 const { CanvasRenderService } = require('chartjs-node-canvas')
+const { uploadFile } = require('../utils')
 
-
-const width = 400
-const height = 400
-const configuration = {
-  type: 'bar',
-  data: {
-    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange', 'Test'],
-    datasets: [{
-      label: '# of Votes',
-      data: [12, 19, 3, 5, 2, 3, 5, 1, 6, 8],
-      backgroundColor: [
-        'rgba(255, 99, 132, 0.2)',
-      ],
-      borderColor: [
-        'rgba(255,99,132,1)',
-      ],
-      borderWidth: 1,
-    }],
-  },
-  options: {
-    scales: {
-      yAxes: [{
-        ticks: {
-          beginAtZero: true,
-        },
-      }],
-    },
-  },
-}
 
 module.exports = async (ctx) => {
   const arg = ctx.message.text.split(/ +/)
   const stock = await ctx.db.Stock.get(arg[1])
+  const labels = []
+  const data = []
 
-  const canvasRenderService = new CanvasRenderService(width, height)
-  const image = await canvasRenderService.renderToBuffer(configuration)
-  const dataUrl = await canvasRenderService.renderToDataURL(configuration)
+  const now = new Date()
+  const gte = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const lte = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+  const his = await ctx.db.Stock.aggregate([{
+    $match: {
+      username: stock.username,
+      'history.time': {
+        $gte: gte,
+        $lte: lte,
+      },
+    },
+  }, {
+    $project: {
+      history: {
+        $filter: {
+          input: '$history',
+          as: 'history',
+          cond: {
+            $and: [
+              { $gte: ['$$history.time', gte] },
+              { $lte: ['$$history.time', lte] },
+            ],
+          },
+        },
+      },
+    },
+  }])
 
-  const bufferStream = new stream.PassThrough()
-  bufferStream.end(image)
-
-  console.log(bufferStream)
-
-  const fileName = 'tmp/out.png'
-
-  const stream = fs.createReadStream(fileName)
-
-  console.log(image)
-  console.log(stream)
-
-  await fs.writeFile(fileName, image, (err) => {
-    if (err) console.log(err)
+  his[0].history.forEach((h) => {
+    labels.push(dateFormat(h.time, 'H:MM'))
+    data.push(h.price)
   })
 
-  const formData = {
-    file: stream,
+  const canvasRenderService = new CanvasRenderService(1200, 600)
+
+  const configuration = {
+    backgroundColor: 'rgba(48, 160, 214, 1)',
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: 'rgba(48, 160, 214, 0.2)',
+        borderColor: 'rgba(48, 160, 214, 1)',
+      }],
+    },
+    options: {
+      title: {
+        display: true,
+        fontSize: 25,
+        fontColor: 'rgba(48, 160, 214, 1)',
+        text: stock.title,
+      },
+      legend: {
+        display: false,
+      },
+    },
   }
 
-  request.post({ url: 'https://telegra.ph/upload', formData }, (err, httpResponse, body) => {
-    if (err) {
-      console.error('upload failed:', err)
-    }
-    console.log('Upload successful!  Server responded with:', body)
-  })
-
-  let priceHistory = ''
-
-  stock.history.forEach((h) => {
-    priceHistory += `${h.price} - ${dateFormat(h.time, 'H:MM')}\n`
-  })
+  const image = await canvasRenderService.renderToBuffer(configuration)
+  const upload = await uploadFile(image)
+  const chart = `telegra.ph${upload[0].src}`
 
   ctx.replyWithHTML(ctx.i18n.t('stock.info', {
     title: stock.title,
     username: stock.username,
     symbol: stock.symbol,
     price: stock.price,
-    priceHistory,
+    chart,
   }))
 }

@@ -1,6 +1,6 @@
 {
   "name": "tstocksbot",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "@TStocksBot",
   "main": "index.js",
   "scripts": {
@@ -25,6 +25,7 @@
     "cron": "^1.6.0",
     "dateformat": "^3.0.3",
     "dotenv": "^6.2.0",
+    "form-data": "^2.3.3",
     "ioredis": "^4.6.2",
     "mongoose": "^5.4.15",
     "mongoose-float": "^1.0.3",
@@ -36,6 +37,6 @@
   "devDependencies": {
     "@atomix/eslint-config": "^6.4.0",
     "babel-eslint": "^10.0.1",
-    "eslint": "^5.14.1"
+    "eslint": "^5.12.0"
   }
 }

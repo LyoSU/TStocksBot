@@ -12,7 +12,7 @@ const historySchema = mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-}, { _id: false })
+})
 
 const stockSchema = mongoose.Schema({
   tgstatId: {
@@ -43,7 +43,7 @@ const stockSchema = mongoose.Schema({
 const Stock = mongoose.model('Stock', stockSchema)
 
 Stock.get = async (username) => {
-  let stock = await Stock.findOne({ username })
+  let stock = await Stock.findOne({ username: { $regex: new RegExp(username, 'i') } })
 
   if (!stock) {
     const channel = await tgstat(username)
@@ -54,6 +54,7 @@ Stock.get = async (username) => {
     stock.symbol = symbol
     stock.username = channel.username
     stock.title = channel.title
+    await stock.save()
   }
 
   return stock
