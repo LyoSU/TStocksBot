@@ -1,7 +1,10 @@
 const {
   getMembers,
   tgstat,
+  uploadFile,
 } = require.main.require('./utils')
+const dateFormat = require('dateformat')
+const { CanvasRenderService } = require('chartjs-node-canvas')
 const mongoose = require('mongoose')
 const Float = require('mongoose-float').loadType(mongoose, 5)
 
@@ -36,6 +39,7 @@ const stockSchema = mongoose.Schema({
   title: String,
   price: Float,
   history: [historySchema],
+  chart: String,
 }, {
   timestamps: true,
 })
@@ -60,23 +64,93 @@ Stock.get = async (username) => {
   return stock
 }
 
-Stock.update = async (username) => {
-  const channel = await tgstat(username)
+Stock.update = async (channelId) => {
+  const channel = await tgstat(channelId)
   const members = await getMembers(channel.username)
-  let price = ((members / 10000) * (channel.daily_reach / channel.avg_post_reach)) / 100
+  let price = ((members / (channel.avg_post_reach / 100)) * (channel.daily_reach / 10000)) / 10000
 
   price = parseFloat(price.toFixed(5))
 
-  const stock = await Stock.get(username)
+  const stock = await Stock.get(channel.username)
 
   stock.title = channel.title
   if (stock.price !== price) {
     stock.price = price
     stock.history.push({ price, time: new Date() })
   }
-  stock.save()
 
-  return { status: 'ok', stock }
+  const now = new Date()
+  const gte = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 6)
+  const lte = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 6)
+  const his = await Stock.aggregate([{
+    $match: {
+      username: stock.username,
+      'history.time': {
+        $gte: gte,
+        $lte: lte,
+      },
+    },
+  }, {
+    $project: {
+      history: {
+        $filter: {
+          input: '$history',
+          as: 'history',
+          cond: {
+            $and: [
+              { $gte: ['$$history.time', gte] },
+              { $lte: ['$$history.time', lte] },
+            ],
+          },
+        },
+      },
+    },
+  }])
+
+  if (his.length > 0) {
+    const labels = []
+    const data = []
+
+    his[0].history.forEach((h) => {
+      labels.push(dateFormat(h.time, 'H:MM'))
+      data.push(h.price)
+    })
+
+    const canvasRenderService = new CanvasRenderService(1200, 600)
+
+    const configuration = {
+      backgroundColor: 'rgba(48, 160, 214, 1)',
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: 'rgba(48, 160, 214, 0.2)',
+          borderColor: 'rgba(48, 160, 214, 1)',
+        }],
+      },
+      options: {
+        title: {
+          display: true,
+          fontSize: 25,
+          fontColor: 'rgba(48, 160, 214, 1)',
+          text: stock.title,
+        },
+        legend: {
+          display: false,
+        },
+      },
+    }
+
+    const image = await canvasRenderService.renderToBuffer(configuration)
+    const upload = await uploadFile(image)
+
+    stock.chart = `telegra.ph${upload[0].src}`
+  }
+
+  await stock.save()
+
+  return stock
 }
 
 module.exports = Stock
