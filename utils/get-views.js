@@ -7,8 +7,6 @@ module.exports = async (channelId) => {
   let totalMessage = 0
   let totalViews = 0
 
-  console.log(channel)
-
   await channel.forEach((message, i) => {
     if (i > 0) {
       if (message.views) {

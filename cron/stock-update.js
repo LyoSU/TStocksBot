@@ -5,7 +5,7 @@ const {
 
 
 module.exports = () => {
-  const job = new CronJob('0 * * * * *', (async () => {
+  const job = new CronJob('0 */5 * * * *', (async () => {
     const stocks = await Stock.find()
 
     stocks.forEach(async (stock, index) => {
