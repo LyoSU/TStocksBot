@@ -14,7 +14,7 @@ module.exports = () => {
         const result = await Stock.update(stock.username)
 
         if (result.status === 'error') console.log(`error: ${result.error}`)
-      }, index * 3000)
+      }, index * ( 1000 * 15 )
     })
   }))
 
