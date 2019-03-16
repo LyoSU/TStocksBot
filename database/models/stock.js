@@ -1,5 +1,6 @@
 const {
   getMembers,
+  getViews,
   tgstat,
   uploadFile,
 } = require.main.require('./utils')
@@ -67,7 +68,8 @@ Stock.get = async (username) => {
 Stock.update = async (channelId) => {
   const channel = await tgstat(channelId)
   const members = await getMembers(channel.username)
-  let price = ((members / (channel.avg_post_reach / 100)) * (channel.daily_reach / 10000)) / 10000
+  const views = await getViews(channel.username)
+  let price = ((members / 100000) * (views / 10000)) / 10
 
   price = parseFloat(price.toFixed(5))
 
@@ -80,8 +82,8 @@ Stock.update = async (channelId) => {
   }
 
   const now = new Date()
-  const gte = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 6)
-  const lte = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 6)
+  const gte = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const lte = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
   const his = await Stock.aggregate([{
     $match: {
       username: stock.username,
@@ -107,7 +109,7 @@ Stock.update = async (channelId) => {
     },
   }])
 
-  if (his.length > 0) {
+  if (his[0] && his[0].history.length > 0) {
     const labels = []
     const data = []
 
