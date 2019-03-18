@@ -8,7 +8,7 @@ module.exports = async (channelId) => {
   let totalViews = 0
 
   await channel.forEach((message, i) => {
-    if (i > 0) {
+    if (i > 5) {
       if (message.views) {
         totalMessage++
         totalViews += message.views
