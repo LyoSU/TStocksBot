@@ -1,6 +1,5 @@
 const {
-  getMembers,
-  getViews,
+  channelParse,
   tgstat,
   uploadFile,
 } = require.main.require('./utils')
@@ -19,7 +18,7 @@ const historySchema = mongoose.Schema({
 })
 
 const stockSchema = mongoose.Schema({
-  tgstatId: {
+  channelId: {
     type: Number,
     index: true,
     unique: true,
@@ -51,31 +50,53 @@ Stock.get = async (username) => {
   let stock = await Stock.findOne({ username: { $regex: new RegExp(username, 'i') } })
 
   if (!stock) {
-    const channel = await tgstat(username)
-    const symbol = channel.username.replace(/[_aeiou0-9]/ig, '').substr(0, 5).toUpperCase()
+    const channel = await channelParse(username)
 
-    stock = new Stock()
-    stock.tgstatId = channel.id
-    stock.symbol = symbol
-    stock.username = channel.username
-    stock.title = channel.title
-    await stock.save()
+    if (channel.Chat.username === username) {
+      const symbol = channel.Chat.username.replace(/[_aeiou0-9]/ig, '').substr(0, 5).toUpperCase()
+
+      stock = new Stock()
+      stock.channelId = channel.channel_id
+      stock.symbol = symbol
+      stock.username = channel.Chat.username
+      stock.title = channel.Chat.title
+      await stock.save()
+    }
   }
 
   return stock
 }
 
-Stock.update = async (channelId) => {
-  const channel = await tgstat(channelId)
-  const members = await getMembers(channel.username)
-  const views = await getViews(channel.username)
-  let price = ((members / 100000) * (views / 10000)) / 10
+Stock.update = async (peer) => {
+  const channel = await channelParse(peer)
+
+  console.log(channel)
+
+  let totalMessage = 0
+  let totalViews = 0
+
+  const nowUnix = Math.floor(Date.now() / 1000)
+
+  await channel.messages.forEach((message) => {
+    if (message.date < (nowUnix - (3600 * 3))) {
+      if (message.views) {
+        totalMessage++
+        totalViews += message.views
+      }
+    }
+  })
+
+  const viewsAvg = totalViews / totalMessage
+
+  let price = ((channel.full.participants_count / 100000) * (viewsAvg / 10000)) / 10
 
   price = parseFloat(price.toFixed(5))
 
-  const stock = await Stock.get(channel.username)
+  console.log(price)
 
-  stock.title = channel.title
+  const stock = await Stock.get(peer)
+
+  stock.title = channel.Chat.title
   if (stock.price !== price) {
     stock.price = price
     stock.history.push({ price, time: new Date() })
