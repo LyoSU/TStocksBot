@@ -3,6 +3,7 @@ const {
   Stock,
 } = require('../database/models/')
 
+
 Stock.update('dvachannel')
 
 module.exports = () => {

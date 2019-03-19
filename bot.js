@@ -38,7 +38,7 @@ bot.use(async (ctx, next) => {
   console.log('Response time %sms', ms)
 })
 
-bot.command('stock', handleStock)
+bot.hears(/(?:\$(\w{2,32})|(?:(?:t\.me)\/|@)(\w{2,32}))/, handleStock)
 bot.on('text', handleProfile)
 
 bot.launch()

@@ -1,6 +1,5 @@
 module.exports = async (ctx) => {
-  const arg = ctx.message.text.split(/ +/)
-  const stock = await ctx.db.Stock.get(arg[1])
+  const stock = await ctx.db.Stock.get(ctx.message.text)
 
   if (stock) {
     ctx.replyWithHTML(ctx.i18n.t('stock.info', {
