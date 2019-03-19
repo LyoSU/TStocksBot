@@ -1,6 +1,5 @@
 const {
   channelParse,
-  tgstat,
   uploadFile,
 } = require.main.require('./utils')
 const dateFormat = require('dateformat')
@@ -46,13 +45,19 @@ const stockSchema = mongoose.Schema({
 
 const Stock = mongoose.model('Stock', stockSchema)
 
-Stock.get = async (username) => {
-  let stock = await Stock.findOne({ username: { $regex: new RegExp(username, 'i') } })
+Stock.get = async (peer) => {
+  const username = peer.match(/(?:\$(\w{2,32})|(?:(?:t\.me)\/|@)(\w{2,32}))/)
 
-  if (!stock) {
-    const channel = await channelParse(username)
+  let stock
 
-    if (channel.Chat.username === username) {
+  if (!username) stock = await Stock.findOne({ username: { $regex: new RegExp(peer, 'i') } })
+  else if (username[1]) stock = await Stock.findOne({ symbol: username[1].toUpperCase() })
+  else if (username[2]) stock = await Stock.findOne({ username: { $regex: new RegExp(username[2], 'i') } })
+
+  if (!stock && username[2]) {
+    const channel = await channelParse(username[2])
+
+    if (channel.type === 'channel') {
       const symbol = channel.Chat.username.replace(/[_aeiou0-9]/ig, '').substr(0, 5).toUpperCase()
 
       stock = new Stock()
@@ -70,15 +75,13 @@ Stock.get = async (username) => {
 Stock.update = async (peer) => {
   const channel = await channelParse(peer)
 
-  console.log(channel)
-
   let totalMessage = 0
   let totalViews = 0
 
   const nowUnix = Math.floor(Date.now() / 1000)
 
   await channel.messages.forEach((message) => {
-    if (message.date < (nowUnix - (3600 * 3))) {
+    if (!message.fwd_from && message.date < (nowUnix - (3600 * 3))) {
       if (message.views) {
         totalMessage++
         totalViews += message.views
@@ -88,11 +91,9 @@ Stock.update = async (peer) => {
 
   const viewsAvg = totalViews / totalMessage
 
-  let price = ((channel.full.participants_count / 100000) * (viewsAvg / 10000)) / 10
+  let price = ((channel.full.participants_count / 10000) * (viewsAvg / 10000)) / 100
 
   price = parseFloat(price.toFixed(5))
-
-  console.log(price)
 
   const stock = await Stock.get(peer)
 
@@ -103,7 +104,7 @@ Stock.update = async (peer) => {
   }
 
   const now = new Date()
-  const gte = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const gte = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
   const lte = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
   const his = await Stock.aggregate([{
     $match: {
@@ -130,7 +131,7 @@ Stock.update = async (peer) => {
     },
   }])
 
-  if (his[0] && his[0].history.length > 0) {
+  if (his[0] && his[0].history.length > 1) {
     const labels = []
     const data = []
 
@@ -157,7 +158,7 @@ Stock.update = async (peer) => {
           display: true,
           fontSize: 25,
           fontColor: 'rgba(48, 160, 214, 1)',
-          text: stock.title,
+          text: stock.symbol,
         },
         legend: {
           display: false,
