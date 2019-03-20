@@ -81,7 +81,7 @@ Stock.update = async (peer) => {
   const nowUnix = Math.floor(Date.now() / 1000)
 
   await channel.messages.forEach((message) => {
-    if (!message.fwd_from && message.date < (nowUnix - (3600 * 3))) {
+    if (!message.fwd_from && message.date < (nowUnix - (3600 * 6))) {
       if (message.views) {
         totalMessage++
         totalViews += message.views
