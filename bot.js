@@ -10,6 +10,7 @@ const {
 const {
   handleProfile,
   handleStock,
+  handleBuy,
 } = require('./handlers')
 const {
   cronStockUpdate,
@@ -39,6 +40,9 @@ bot.use(async (ctx, next) => {
 })
 
 bot.hears(/(?:\$(\w{2,32})|(?:(?:t\.me)\/|@)(\w{2,32}))/, handleStock)
+bot.action(/stock.amount:(\w+):(\d+)/)
+bot.action(/stock.buy:(\w+):(\d+)/, handleBuy)
+
 bot.on('text', handleProfile)
 
 bot.launch()

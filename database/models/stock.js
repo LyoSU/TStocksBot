@@ -8,14 +8,6 @@ const mongoose = require('mongoose')
 const Float = require('mongoose-float').loadType(mongoose, 5)
 
 
-const historySchema = mongoose.Schema({
-  price: Float,
-  time: {
-    type: Date,
-    default: Date.now,
-  },
-})
-
 const stockSchema = mongoose.Schema({
   channelId: {
     type: Number,
@@ -37,13 +29,28 @@ const stockSchema = mongoose.Schema({
   },
   title: String,
   price: Float,
-  history: [historySchema],
-  chart: String,
+  charts: {
+    day: String,
+  },
 }, {
   timestamps: true,
 })
 
 const Stock = mongoose.model('Stock', stockSchema)
+
+const historySchema = mongoose.Schema({
+  stock: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Stock',
+  },
+  price: Float,
+  time: {
+    type: Date,
+    default: Date.now,
+  },
+})
+
+Stock.History = mongoose.model('History', historySchema)
 
 Stock.get = async (peer) => {
   const username = peer.match(/(?:\$(\w{2,32})|(?:(?:t\.me)\/|@)(\w{2,32}))/)
@@ -81,7 +88,7 @@ Stock.update = async (peer) => {
   const nowUnix = Math.floor(Date.now() / 1000)
 
   await channel.messages.forEach((message) => {
-    if (!message.fwd_from && message.date < (nowUnix - (3600 * 6))) {
+    if (!message.fwd_from && message.date < (nowUnix - 3600)) {
       if (message.views) {
         totalMessage++
         totalViews += message.views
@@ -99,43 +106,31 @@ Stock.update = async (peer) => {
 
   stock.title = channel.Chat.title
   if (stock.price !== price) {
+    const history = new Stock.History()
+
+    history.stock = stock
+    history.price = price
+    await history.save()
     stock.price = price
-    stock.history.push({ price, time: new Date() })
   }
 
   const now = new Date()
   const gte = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
   const lte = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
-  const his = await Stock.aggregate([{
-    $match: {
-      username: stock.username,
-      'history.time': {
-        $gte: gte,
-        $lte: lte,
-      },
-    },
-  }, {
-    $project: {
-      history: {
-        $filter: {
-          input: '$history',
-          as: 'history',
-          cond: {
-            $and: [
-              { $gte: ['$$history.time', gte] },
-              { $lte: ['$$history.time', lte] },
-            ],
-          },
-        },
-      },
-    },
-  }])
 
-  if (his[0] && his[0].history.length > 1) {
+  const his = await Stock.History.find({
+    stock: stock.id,
+    time: {
+      $gte: gte,
+      $lte: lte,
+    },
+  })
+
+  if (his.length > 1) {
     const labels = []
     const data = []
 
-    his[0].history.forEach((h) => {
+    his.forEach((h) => {
       labels.push(dateFormat(h.time, 'H:MM'))
       data.push(h.price)
     })
@@ -169,7 +164,7 @@ Stock.update = async (peer) => {
     const image = await canvasRenderService.renderToBuffer(configuration)
     const upload = await uploadFile(image)
 
-    stock.chart = `telegra.ph${upload[0].src}`
+    stock.charts.day = `telegra.ph${upload[0].src}`
   }
 
   await stock.save()

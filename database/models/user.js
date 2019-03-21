@@ -38,4 +38,38 @@ User.get = async (ctx) => {
   return user
 }
 
+const portfolioSchema = mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  stock: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Stock',
+  },
+  amount: Number,
+  costBasis: Float,
+  time: {
+    type: Date,
+    default: Date.now,
+  },
+})
+
+User.Portfolio = mongoose.model('Portfolio', portfolioSchema)
+
+User.Portfolio.buy = async (ctx, peer, amount) => {
+  const user = await ctx.db.User.get(ctx)
+  const stock = await ctx.db.Stock.get(peer)
+
+  const portfolio = new User.Portfolio()
+
+  portfolio.user = user.id
+  portfolio.stock = stock.id
+  portfolio.amount = amount
+  portfolio.costBasis = stock.price
+  await portfolio.save()
+
+  return portfolio
+}
+
 module.exports = User
