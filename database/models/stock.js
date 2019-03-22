@@ -115,7 +115,7 @@ Stock.update = async (peer) => {
   }
 
   const now = new Date()
-  const gte = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
+  const gte = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const lte = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
 
   const his = await Stock.History.find({
