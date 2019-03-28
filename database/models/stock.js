@@ -98,7 +98,7 @@ Stock.update = async (peer) => {
 
   const viewsAvg = totalViews / totalMessage
 
-  let price = ((channel.full.participants_count / 10000) * (viewsAvg / 10000)) / 100
+  let price = ((channel.full.participants_count / 25000) * (viewsAvg / 50000)) / 1000
 
   price = parseFloat(price.toFixed(5))
 

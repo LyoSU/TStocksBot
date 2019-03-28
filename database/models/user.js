@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Float = require('mongoose-float').loadType(mongoose, 5)
+const Stock = require('./stock')
 
 
 const userSchema = mongoose.Schema({
@@ -22,16 +23,16 @@ const userSchema = mongoose.Schema({
 
 const User = mongoose.model('User', userSchema)
 
-User.get = async (ctx) => {
-  let user = await User.findOne({ telegram_id: ctx.from.id })
+User.get = async (tgUser) => {
+  let user = await User.findOne({ telegram_id: tgUser.id })
 
   if (!user) {
     user = new User()
-    user.telegram_id = ctx.from.id
+    user.telegram_id = tgUser.id
   }
-  user.first_name = ctx.from.first_name
-  user.last_name = ctx.from.last_name
-  user.username = ctx.from.username
+  user.first_name = tgUser.first_name
+  user.last_name = tgUser.last_name
+  user.username = tgUser.username
   user.updatedAt = new Date()
   await user.save()
 
@@ -57,19 +58,88 @@ const portfolioSchema = mongoose.Schema({
 
 User.Portfolio = mongoose.model('Portfolio', portfolioSchema)
 
-User.Portfolio.buy = async (ctx, peer, amount) => {
-  const user = await ctx.db.User.get(ctx)
-  const stock = await ctx.db.Stock.get(peer)
+User.Portfolio.getByPeer = async (tgUser, peer) => {
+  const user = await User.get(tgUser)
+  const stock = await Stock.get(peer)
+  const portfolio = await User.Portfolio.find({
+    user,
+    stock,
+  })
 
-  const portfolio = new User.Portfolio()
-
-  portfolio.user = user.id
-  portfolio.stock = stock.id
-  portfolio.amount = amount
-  portfolio.costBasis = stock.price
-  await portfolio.save()
+  portfolio.stock = stock
 
   return portfolio
+}
+
+User.Portfolio.getAll = async (tgUser) => {
+  const user = await User.get(tgUser)
+  const portfolio = await User.Portfolio.find({
+    user,
+  }).sort({ costBasis: -1 }).populate('stock')
+
+  return portfolio
+}
+
+User.Portfolio.buy = async (tgUser, peer, amount) => {
+  const user = await User.get(tgUser)
+  const stock = await Stock.get(peer)
+
+  if (user.balance >= stock.price) {
+    user.balance -= stock.price
+    user.save()
+
+    console.log(user.balance)
+
+    const portfolio = new User.Portfolio()
+
+    portfolio.user = user
+    portfolio.stock = stock
+    portfolio.amount = amount
+    portfolio.costBasis = stock.price
+    portfolio.save()
+
+    return {
+      portfolio,
+    }
+  }
+
+  return {
+    error: 'MONEY_ERROR',
+  }
+}
+
+User.Portfolio.sell = async (tgUser, peer, amount) => {
+  let sellAmount = 0
+  const user = await User.get(tgUser)
+  const portfolio = await User.Portfolio.getByPeer(tgUser, peer)
+
+  if (portfolio.length > 0) {
+    if (portfolio[0].amount <= amount) {
+      portfolio[0].remove()
+      sellAmount = portfolio[0].amount
+    }
+    else {
+      portfolio[0].amount -= amount
+      portfolio.save()
+      sellAmount = amount
+    }
+
+    if (sellAmount > 0) {
+      // eslint-disable-next-line max-len
+      user.balance += (portfolio.stock.price * sellAmount) - (portfolio.stock.price * (global.gameConfig.sellFee / 100))
+      user.save()
+    }
+
+    console.log(portfolio.length, user.balance, (portfolio.stock.price - global.gameConfig.sellFee))
+
+    return {
+      stock: portfolio.stock,
+    }
+  }
+
+  return {
+    error: 'NOT_FOUND',
+  }
 }
 
 module.exports = User

@@ -1,5 +1,6 @@
 const path = require('path')
 const Telegraf = require('telegraf')
+const rateLimit = require('telegraf-ratelimit')
 const I18n = require('telegraf-i18n')
 const {
   models,
@@ -11,13 +12,17 @@ const {
   handleProfile,
   handleStock,
   handleBuy,
+  handleSell,
+  handlePortfolio,
 } = require('./handlers')
 const {
   cronStockUpdate,
 } = require('./cron')
 
 
-cronStockUpdate()
+global.gameConfig = {
+  sellFee: 0.25,
+}
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
@@ -30,6 +35,11 @@ const i18n = new I18n({
 
 bot.use(i18n.middleware())
 
+const moneyLimitConfig = rateLimit({
+  window: 1000,
+  limit: 1,
+})
+
 bot.use(async (ctx, next) => {
   ctx.ms = new Date()
   await userUpdate(ctx)
@@ -41,10 +51,15 @@ bot.use(async (ctx, next) => {
 
 bot.hears(/(?:\$(\w{2,32})|(?:(?:t\.me)\/|@)(\w{2,32}))/, handleStock)
 bot.action(/stock.amount:(\w+):(\d+)/)
-bot.action(/stock.buy:(\w+):(\d+)/, handleBuy)
+bot.action(/stock.buy:(\w+):(\d+)/, rateLimit(moneyLimitConfig), handleBuy)
+bot.action(/stock.sell:(\w+):(\d+)/, rateLimit(moneyLimitConfig), handleSell)
+
+bot.command('portfolio', handlePortfolio)
 
 bot.on('text', handleProfile)
 
 bot.launch()
 
 console.log('bot start')
+
+cronStockUpdate()

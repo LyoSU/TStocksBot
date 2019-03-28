@@ -13,10 +13,11 @@ module.exports = async (ctx) => {
       chart: stock.charts.day,
     }), Markup.inlineKeyboard([
       [
-        Markup.callbackButton('amount', `stock.amount:${stock.username}:1`),
+        Markup.callbackButton(ctx.i18n.t('stock.btn.update'), `stock.update:${stock.username}`),
       ],
       [
-        Markup.callbackButton('buy', `stock.buy:${stock.username}:1`),
+        Markup.callbackButton(ctx.i18n.t('stock.btn.buy'), `stock.buy:${stock.username}:1`),
+        Markup.callbackButton(ctx.i18n.t('stock.btn.sell'), `stock.sell:${stock.username}:1`),
       ],
     ]).extra())
   }
