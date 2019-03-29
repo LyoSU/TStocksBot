@@ -11,23 +11,27 @@ module.exports = async (ctx) => {
     const portfolioStock = {}
     let portfolio = ''
 
-    portfolioGet.forEach((el) => {
-      if (!portfolioStock[el.stock.id]) {
-        portfolioStock[el.stock.id] = {
+    portfolioGet.forEach((share) => {
+      if (!portfolioStock[share.stock.id]) {
+        portfolioStock[share.stock.id] = {
           count: 0,
           cost: 0,
-          stock: el.stock,
+          stock: share.stock,
         }
       }
-      portfolioStock[el.stock.id].count++
-      portfolioStock[el.stock.id].cost += el.costBasis
+      portfolioStock[share.stock.id].count++
+      portfolioStock[share.stock.id].cost += share.costBasis
     })
 
     Object.keys(portfolioStock).forEach((stockId) => {
       const baseCost = portfolioStock[stockId].cost
       const cost = portfolioStock[stockId].stock.price * portfolioStock[stockId].count
 
-      portfolio += `\n$${portfolioStock[stockId].stock.symbol} - ${baseCost.toFixed(5)} / ${cost.toFixed(5)}`
+      portfolio += ctx.i18n.t('portfolio.stock', {
+        symbol: portfolioStock[stockId].stock.symbol,
+        baseCost: baseCost.toFixed(5),
+        cost: cost.toFixed(5),
+      })
     })
 
     resultText = ctx.i18n.t('portfolio.info', {
