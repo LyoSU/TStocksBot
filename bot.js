@@ -11,8 +11,6 @@ const {
 const {
   handleProfile,
   handleStock,
-  handleBuy,
-  handleSell,
   handleTop,
   handlePortfolio,
 } = require('./handlers')
@@ -55,10 +53,7 @@ bot.hears(['/portfolio', 'Портфолио'], handlePortfolio)
 
 bot.hears(/(?:\$(\w{2,32})|(?:(?:t\.me)\/|(\/s_|@))(\w{2,32}))/, handleStock)
 
-bot.action(/stock.update:(\w+)/, handleStock)
-bot.action(/stock.amount:(\w+):(\d+)/)
-bot.action(/stock.buy:(\w+):(\d+)/, rateLimit(moneyLimitConfig), handleBuy)
-bot.action(/stock.sell:(\w+):(\d+)/, rateLimit(moneyLimitConfig), handleSell)
+bot.action(/stock.(\w+):(\w+):(\d+)/, rateLimit(moneyLimitConfig), handleStock)
 
 bot.on('text', handleProfile)
 

@@ -22,6 +22,8 @@ stock:
     buy: Купить
     sell: Продать
   answer:
+    update:
+      suc: Обновлено
     buy:
       suc: Ты успешно купил акцию $${symbol}
       error:
