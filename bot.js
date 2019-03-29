@@ -13,6 +13,7 @@ const {
   handleStock,
   handleBuy,
   handleSell,
+  handleTop,
   handlePortfolio,
 } = require('./handlers')
 const {
@@ -49,12 +50,15 @@ bot.use(async (ctx, next) => {
   console.log('Response time %sms', ms)
 })
 
-bot.hears(/(?:\$(\w{2,32})|(?:(?:t\.me)\/|@)(\w{2,32}))/, handleStock)
+bot.command('top', handleTop)
+bot.command('portfolio', handlePortfolio)
+
+bot.hears(/(?:\$(\w{2,32})|(?:(?:t\.me)\/|(\/s_|@))(\w{2,32}))/, handleStock)
+
+bot.action(/stock.update:(\w+)/, handleStock)
 bot.action(/stock.amount:(\w+):(\d+)/)
 bot.action(/stock.buy:(\w+):(\d+)/, rateLimit(moneyLimitConfig), handleBuy)
 bot.action(/stock.sell:(\w+):(\d+)/, rateLimit(moneyLimitConfig), handleSell)
-
-bot.command('portfolio', handlePortfolio)
 
 bot.on('text', handleProfile)
 

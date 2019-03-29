@@ -15,7 +15,7 @@ const userSchema = mongoose.Schema({
   username: String,
   balance: {
     type: Float,
-    default: 1.00000000,
+    default: 10,
   },
 }, {
   timestamps: true,

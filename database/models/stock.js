@@ -79,6 +79,12 @@ Stock.get = async (peer) => {
   return stock
 }
 
+Stock.getTop = async () => {
+  const stock = await Stock.find().skip(0).limit(10).sort({ price: -1 })
+
+  return stock
+}
+
 Stock.update = async (peer) => {
   const channel = await channelParse(peer)
 
