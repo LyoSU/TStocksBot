@@ -50,8 +50,8 @@ bot.use(async (ctx, next) => {
   console.log('Response time %sms', ms)
 })
 
-bot.command('top', handleTop)
-bot.command('portfolio', handlePortfolio)
+bot.hears(['/top', 'Топ'], handleTop)
+bot.hears(['/portfolio', 'Портфолио'], handlePortfolio)
 
 bot.hears(/(?:\$(\w{2,32})|(?:(?:t\.me)\/|(\/s_|@))(\w{2,32}))/, handleStock)
 
