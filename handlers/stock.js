@@ -1,10 +1,60 @@
 module.exports = async (ctx) => {
+  let answerText = ''
+  let showAlert = false
   let peer = ''
 
-  if (ctx.match[2] === '/s_') ctx.message.text = ctx.message.text.replace('/s_', '$')
-  // eslint-disable-next-line prefer-destructuring
-  if (ctx.callbackQuery) peer = ctx.match[1]
-  else peer = ctx.message.text
+  if (ctx.callbackQuery) {
+    peer = `$${ctx.match[2]}`
+    let result = ''
+
+    switch (ctx.match[1]) {
+      case 'update':
+        answerText = ctx.i18n.t('stock.answer.update.suc')
+        break
+      case 'buy':
+        result = await ctx.db.User.Portfolio.buy(ctx.from, peer, ctx.match[3])
+
+        if (result.portfolio) {
+          answerText = ctx.i18n.t('stock.answer.buy.suc', {
+            symbol: result.portfolio.stock.symbol,
+          })
+        }
+        else if (result.error === 'MONEY_ERROR') {
+          answerText = ctx.i18n.t('stock.answer.buy.error.money')
+          showAlert = true
+        }
+        else {
+          answerText = ctx.i18n.t('error.unknown')
+          showAlert = true
+        }
+        break
+      case 'sell':
+        result = await ctx.db.User.Portfolio.sell(ctx.from, ctx.match[1], ctx.match[2])
+
+        if (result.stock) {
+          answerText = ctx.i18n.t('stock.answer.sell.suc', {
+            symbol: result.stock.symbol,
+          })
+        }
+        else if (result.error === 'NOT_FOUND') {
+          answerText = ctx.i18n.t('stock.answer.sell.error.not_found')
+          showAlert = true
+        }
+        else {
+          answerText = ctx.i18n.t('error.unknown')
+          showAlert = true
+        }
+        break
+      default:
+        answerText = ctx.i18n.t('error.unknown')
+        showAlert = true
+    }
+  }
+
+  if (ctx.message) {
+    if (ctx.match[2] === '/s_') ctx.message.text = ctx.message.text.replace('/s_', '')
+    peer = `$${ctx.message.text}`
+  }
 
   const stock = await ctx.db.Stock.get(peer)
   const portfolio = await ctx.db.User.Portfolio.getByPeer(ctx.from, peer)
@@ -46,24 +96,23 @@ module.exports = async (ctx) => {
         [
           {
             text: ctx.i18n.t('stock.btn.update'),
-            callback_data: `stock.update:${stock.username}`,
+            callback_data: `stock.update:${stock.symbol}:0`,
           },
         ],
         [
           {
             text: ctx.i18n.t('stock.btn.buy'),
-            callback_data: `stock.buy:${stock.username}:1`,
+            callback_data: `stock.buy:${stock.symbol}:1`,
           },
           {
             text: ctx.i18n.t('stock.btn.sell'),
-            callback_data: `stock.sell:${stock.username}:1`,
+            callback_data: `stock.sell:${stock.symbol}:1`,
           },
         ],
       ],
     }
 
     if (ctx.callbackQuery) {
-      ctx.answerCbQuery('')
       ctx.editMessageText(text, {
         parse_mode: 'HTML',
         reply_markup: markup,
@@ -71,6 +120,8 @@ module.exports = async (ctx) => {
         if (error.description === 'Bad Request: message is not modified') return ''
         return console.log('Ooops', error)
       })
+
+      ctx.answerCbQuery(answerText, showAlert)
     }
     else {
       ctx.replyWithHTML(text, {
