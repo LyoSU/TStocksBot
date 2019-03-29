@@ -61,7 +61,7 @@ Stock.get = async (peer) => {
   else if (username[1]) stock = await Stock.findOne({ symbol: username[1].toUpperCase() })
   else if (username[2]) stock = await Stock.findOne({ username: { $regex: new RegExp(username[2], 'i') } })
 
-  if (!stock && username[2]) {
+  if (!stock && username && username[2]) {
     const channel = await channelParse(username[2])
 
     if (channel.type === 'channel') {
