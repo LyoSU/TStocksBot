@@ -102,6 +102,10 @@ Stock.update = async (peer) => {
     }
   })
 
+  // const stockPorfolio = await User.Portfolio.getByStock(peer)
+
+  // console.log(stockPorfolio)
+
   const viewsAvg = totalViews / totalMessage
 
   let price = ((channel.full.participants_count / 25000) * (viewsAvg / 50000)) / 1000

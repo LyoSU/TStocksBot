@@ -29,7 +29,8 @@ module.exports = async (ctx) => {
         }
         break
       case 'sell':
-        result = await ctx.db.User.Portfolio.sell(ctx.from, ctx.match[1], ctx.match[2])
+
+        result = await ctx.db.User.Portfolio.sell(ctx.from, peer, ctx.match[3])
 
         if (result.stock) {
           answerText = ctx.i18n.t('stock.answer.sell.suc', {
