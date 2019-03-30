@@ -71,10 +71,19 @@ User.Portfolio.getByPeer = async (tgUser, peer) => {
   return portfolio
 }
 
-User.Portfolio.getAll = async (tgUser) => {
+User.Portfolio.getByUser = async (tgUser) => {
   const user = await User.get(tgUser)
   const portfolio = await User.Portfolio.find({
     user,
+  }).sort({ costBasis: -1 }).populate('stock')
+
+  return portfolio
+}
+
+User.Portfolio.getByStock = async (peer) => {
+  const stock = await Stock.get(peer)
+  const portfolio = await User.Portfolio.find({
+    stock,
   }).sort({ costBasis: -1 }).populate('stock')
 
   return portfolio
@@ -87,8 +96,6 @@ User.Portfolio.buy = async (tgUser, peer, amount) => {
   if (user.balance >= stock.price) {
     user.balance -= stock.price
     user.save()
-
-    console.log(user.balance)
 
     const portfolio = new User.Portfolio()
 
@@ -129,8 +136,6 @@ User.Portfolio.sell = async (tgUser, peer, amount) => {
       user.balance += (portfolio.stock.price * sellAmount) - (portfolio.stock.price * (global.gameConfig.sellFee / 100))
       user.save()
     }
-
-    console.log(portfolio.length, user.balance, (portfolio.stock.price - global.gameConfig.sellFee))
 
     return {
       stock: portfolio.stock,
