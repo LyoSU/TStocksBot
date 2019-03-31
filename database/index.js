@@ -177,7 +177,8 @@ db.Stock.update = async (peer) => {
 
   let price = ((channel.full.participants_count / 25000) * (viewsAvg / 50000)) / 1000
 
-  price += parseFloat((price * (stockPorfolio.length / 7500)).toFixed(5))
+  price += (price * (stockPorfolio.length / 7500))
+  price = parseFloat(price.toFixed(5))
 
   const stock = await db.Stock.get(peer)
 

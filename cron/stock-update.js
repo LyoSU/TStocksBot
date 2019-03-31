@@ -4,7 +4,7 @@ const {
 } = require('../database')
 
 
-db.Stock.update('dvachannel')
+db.Stock.update('telegram')
 
 module.exports = () => {
   const job = new CronJob('0 */5 * * * *', (async () => {
