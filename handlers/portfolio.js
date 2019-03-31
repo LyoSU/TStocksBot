@@ -4,7 +4,7 @@ const {
 
 
 module.exports = async (ctx) => {
-  const portfolioGet = await ctx.db.User.Portfolio.getByUser(ctx.from)
+  const portfolioGet = await ctx.db.Portfolio.getByUser(ctx.from)
   let resultText = ''
 
   if (portfolioGet.length > 0) {
