@@ -53,8 +53,13 @@ module.exports = async (ctx) => {
   }
 
   if (ctx.message) {
-    if (ctx.match[2] === '/s_') ctx.message.text = ctx.message.text.replace('/s_', '')
-    peer = `$${ctx.message.text}`
+    if (ctx.match[2] === '/s_') {
+      ctx.message.text = ctx.message.text.replace('/s_', '')
+      peer = `$${ctx.message.text}`
+    }
+    else {
+      peer = ctx.message.text
+    }
   }
 
   const stock = await ctx.db.Stock.get(peer)
