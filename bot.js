@@ -3,7 +3,7 @@ const Telegraf = require('telegraf')
 const rateLimit = require('telegraf-ratelimit')
 const I18n = require('telegraf-i18n')
 const {
-  models,
+  db,
 } = require('./database')
 const {
   userUpdate,
@@ -25,7 +25,7 @@ global.gameConfig = {
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
-bot.context.db = models
+bot.context.db = db
 
 const i18n = new I18n({
   directory: path.resolve(__dirname, 'locales'),

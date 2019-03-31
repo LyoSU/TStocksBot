@@ -12,7 +12,7 @@ module.exports = async (ctx) => {
         answerText = ctx.i18n.t('stock.answer.update.suc')
         break
       case 'buy':
-        result = await ctx.db.User.Portfolio.buy(ctx.from, peer, ctx.match[3])
+        result = await ctx.db.Portfolio.buy(ctx.from, peer, ctx.match[3])
 
         if (result.portfolio) {
           answerText = ctx.i18n.t('stock.answer.buy.suc', {
@@ -30,7 +30,7 @@ module.exports = async (ctx) => {
         break
       case 'sell':
 
-        result = await ctx.db.User.Portfolio.sell(ctx.from, peer, ctx.match[3])
+        result = await ctx.db.Portfolio.sell(ctx.from, peer, ctx.match[3])
 
         if (result.stock) {
           answerText = ctx.i18n.t('stock.answer.sell.suc', {
@@ -58,7 +58,7 @@ module.exports = async (ctx) => {
   }
 
   const stock = await ctx.db.Stock.get(peer)
-  const portfolio = await ctx.db.User.Portfolio.getByPeer(ctx.from, peer)
+  const portfolio = await ctx.db.Portfolio.getByPeer(ctx.from, peer)
 
   let shares = ctx.i18n.t('stock.error.no_shares')
 

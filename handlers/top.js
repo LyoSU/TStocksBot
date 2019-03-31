@@ -1,5 +1,4 @@
 module.exports = async (ctx) => {
-
   const getTop = await ctx.db.Stock.getTop()
   let topText = ''
 
