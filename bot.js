@@ -1,5 +1,6 @@
 const path = require('path')
 const Telegraf = require('telegraf')
+const RedisSession = require('telegraf-session-redis')
 const rateLimit = require('telegraf-ratelimit')
 const I18n = require('telegraf-i18n')
 const {
@@ -24,6 +25,18 @@ global.gameConfig = {
 }
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
+
+bot.telegram.getMe().then((botInfo) => {
+  bot.options.username = botInfo.username
+})
+
+const session = new RedisSession({
+  store: {
+    prefix: 'TStocksBot:',
+  },
+})
+
+bot.use(session)
 
 bot.context.db = db
 
@@ -53,9 +66,13 @@ bot.hears(['/portfolio', 'Портфолио'], handlePortfolio)
 
 bot.hears(/(?:\$(\w{2,32})|(?:(?:t\.me)\/|(\/s_|@))(\w{2,32}))/, handleStock)
 
-bot.action(/stock.(\w+):(\w+):(\d+)/, rateLimit(moneyLimitConfig), handleStock)
+bot.action(/stock:(.*)/, rateLimit(moneyLimitConfig), handleStock)
 
 bot.on('text', handleProfile)
+
+// bot.catch((error) => {
+//   console.log('Ooops', error)
+// })
 
 bot.launch()
 

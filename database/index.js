@@ -31,7 +31,7 @@ db.User.get = async (tgUser) => {
   return user
 }
 
-db.Portfolio.getByPeer = async (tgUser, peer) => {
+db.Portfolio.getByStockUser = async (tgUser, peer) => {
   const user = await db.User.get(tgUser)
   const stock = await db.Stock.get(peer)
   const portfolio = await db.Portfolio.find({
@@ -54,7 +54,7 @@ db.Portfolio.getByUser = async (tgUser) => {
   return portfolio
 }
 
-db.Portfolio.getByStock = async (peer) => {
+db.Portfolio.getByStockAll = async (peer) => {
   const stock = await db.Stock.get(peer)
   const portfolio = await db.Portfolio.find({
     stock,
@@ -63,12 +63,17 @@ db.Portfolio.getByStock = async (peer) => {
   return portfolio
 }
 
-db.Portfolio.buy = async (tgUser, peer, amount) => {
+db.Portfolio.buy = async (tgUser, peer, basicAmount) => {
   const user = await db.User.get(tgUser)
   const stock = await db.Stock.get(peer)
+  let amount = basicAmount
 
-  if (user.balance >= stock.price) {
-    user.balance -= stock.price
+  if (user.balance <= stock.price * amount) {
+    amount = Math.floor(user.balance / stock.price)
+  }
+
+  if (amount > 0) {
+    user.balance -= stock.price * amount
     user.save()
 
     const portfolio = new db.Portfolio()
@@ -81,6 +86,8 @@ db.Portfolio.buy = async (tgUser, peer, amount) => {
 
     return {
       portfolio,
+      amount,
+      costBasis: stock.price,
     }
   }
 
@@ -92,7 +99,7 @@ db.Portfolio.buy = async (tgUser, peer, amount) => {
 db.Portfolio.sell = async (tgUser, peer, amount) => {
   let sellAmount = 0
   const user = await db.User.get(tgUser)
-  const portfolio = await db.Portfolio.getByPeer(tgUser, peer)
+  const portfolio = await db.Portfolio.getByStockUser(tgUser, peer)
 
   if (portfolio.length > 0) {
     if (portfolio[0].amount <= amount) {
@@ -101,7 +108,7 @@ db.Portfolio.sell = async (tgUser, peer, amount) => {
     }
     else {
       portfolio[0].amount -= amount
-      portfolio.save()
+      portfolio[0].save()
       sellAmount = amount
     }
 
@@ -172,7 +179,7 @@ db.Stock.update = async (peer) => {
     }
   })
 
-  const stockPorfolio = await db.Portfolio.getByStock(peer)
+  const stockPorfolio = await db.Portfolio.getByStockAll(peer)
   const viewsAvg = totalViews / totalMessage
 
   let price = ((channel.full.participants_count / 25000) * (viewsAvg / 50000)) / 1000
