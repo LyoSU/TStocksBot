@@ -2,18 +2,20 @@ const mongoose = require('mongoose')
 const Float = require('mongoose-float').loadType(mongoose, 5)
 
 
-module.exports = mongoose.Schema({
+const { Schema } = mongoose
+
+module.exports = new Schema({
   user: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
   },
   stock: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Stock',
   },
   amount: Number,
   costBasis: Float,
-  time: {
+  date: {
     type: Date,
     default: Date.now,
   },
