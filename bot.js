@@ -12,13 +12,18 @@ const {
 const {
   handleProfile,
   handleStock,
-  handleTop,
+  handleChannels,
   handlePortfolio,
+  handleTop,
 } = require('./handlers')
 const {
   cronStockUpdate,
 } = require('./cron')
 
+
+const {
+  match,
+} = I18n
 
 global.gameConfig = {
   sellFee: 0.25,
@@ -61,8 +66,9 @@ bot.use(async (ctx, next) => {
   console.log('Response time %sms', ms)
 })
 
-bot.hears(['/top', 'Топ'], handleTop)
-bot.hears(['/portfolio', 'Портфолио'], handlePortfolio)
+bot.hears((['/portfolio', match('profile.btn.portfolio')]), handlePortfolio)
+bot.hears(['/channels', match('profile.btn.channels')], handleChannels)
+bot.hears((['/top', match('profile.btn.top')]), handleTop)
 
 bot.hears(/(?:\$(\w{2,32})|(?:(?:t\.me)\/|(\/s_|@))(\w{2,32}))/, handleStock)
 
