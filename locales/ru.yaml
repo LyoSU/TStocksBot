@@ -1,9 +1,12 @@
-profile: |
-  <b>Имя:</b> ${name}
-  <b>Баланс:</b> ${balance}💲
-
-  Топ каналов - /top
-  Портфолио - /portfolio
+profile:
+  info: |
+    <b>Имя:</b> ${name}
+    <b>Баланс:</b> ${balance}💲
+  btn:
+    profile: 👤 Профиль
+    portfolio: 💼 Портфолио
+    channels: 📢 Каналы
+    top: 🏆 Топ
 stock:
   info: |
     <a href="${chart}">&#8203;</a><b>${title}</b> (@${username})
@@ -53,10 +56,10 @@ portfolio:
     \n/s_${symbol} - ${baseCost}💲 > ${cost}💲
   error:
     empty: Ты ещё не приобрел ни одной акции
-top:
+channels:
   info: |
     <b>Топ каналов:</b>
-    ${topText}
+    ${channelsText}
   stock:
     \n/s_${symbol} - ${price}💲
 error:
