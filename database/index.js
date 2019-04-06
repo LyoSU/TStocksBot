@@ -120,6 +120,8 @@ db.Portfolio.sell = async (tgUser, peer, amount) => {
 
     return {
       stock: portfolio.stock,
+      amount: sellAmount,
+      costBasis: portfolio[0].costBasis,
     }
   }
 

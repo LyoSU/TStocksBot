@@ -10,8 +10,6 @@ module.exports = async (ctx) => {
     ctx.session.stack.sign = 'plus'
   }
 
-  console.log(ctx.session)
-
   let answerText = ''
   let showAlert = false
   let peer = ''
@@ -36,7 +34,6 @@ module.exports = async (ctx) => {
 
   let totalAmount = 0
   let totalCost = 0
-  let costAvrg = 0
   let profitMoney = 0
   let profitProcent = 0
 
@@ -45,10 +42,6 @@ module.exports = async (ctx) => {
       totalAmount += portfolio.amount
       totalCost += portfolio.costBasis * portfolio.amount
     })
-
-    costAvrg = totalCost / totalAmount
-    profitMoney = stock.price - costAvrg
-    profitProcent = (profitMoney / costAvrg) * 100
   }
 
   if (ctx.callbackQuery) {
@@ -81,8 +74,8 @@ module.exports = async (ctx) => {
             symbol: result.portfolio.stock.symbol,
           })
 
-          // totalAmount += result.amount
-          // totalCost += result.costBasis * result.amount
+          totalAmount += result.amount
+          totalCost += result.costBasis * result.amount
         }
         else if (result.error === 'MONEY_ERROR') {
           answerText = ctx.i18n.t('stock.answer.buy.error.money')
@@ -101,6 +94,9 @@ module.exports = async (ctx) => {
           answerText = ctx.i18n.t('stock.answer.sell.suc', {
             symbol: result.stock.symbol,
           })
+
+          totalAmount -= result.amount
+          totalCost -= result.costBasis * result.amount
         }
         else if (result.error === 'NOT_FOUND') {
           answerText = ctx.i18n.t('stock.answer.sell.error.not_found')
@@ -123,6 +119,9 @@ module.exports = async (ctx) => {
     let shares = ctx.i18n.t('stock.error.no_shares')
 
     if (totalAmount > 0) {
+      profitMoney = (stock.price * totalAmount) - totalCost
+      profitProcent = (profitMoney / totalCost) * 100
+
       shares = ctx.i18n.t('stock.shares', {
         shares: totalAmount,
         basicCost: totalCost.toFixed(5),
