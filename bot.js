@@ -29,12 +29,6 @@ global.gameConfig = {
   sellFee: 0.25,
 }
 
-setInterval(() => {
-  const used = process.memoryUsage().heapUsed / 1024 / 1024
-
-  console.log(used)
-}, 1000)
-
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
 bot.telegram.getMe().then((botInfo) => {
