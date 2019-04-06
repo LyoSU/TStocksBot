@@ -43,7 +43,7 @@ module.exports = async (ctx) => {
   if (portfolios.length > 0) {
     portfolios.forEach((portfolio) => {
       totalAmount += portfolio.amount
-      totalCost += portfolio.costBasis * totalAmount
+      totalCost += portfolio.costBasis * portfolio.amount
     })
 
     costAvrg = totalCost / totalAmount
