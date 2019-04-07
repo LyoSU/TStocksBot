@@ -44,7 +44,6 @@ db.Portfolio.getByStockUser = async (tgUser, peer) => {
   return portfolio
 }
 
-
 db.Portfolio.getByUser = async (tgUser) => {
   const user = await db.User.get(tgUser)
   const portfolio = await db.Portfolio.find({
@@ -61,6 +60,34 @@ db.Portfolio.getByStockAll = async (peer) => {
   }).sort({ costBasis: -1 }).populate('stock')
 
   return portfolio
+}
+
+db.Portfolio.getValue = async (tgUser) => {
+  const portfolio = await db.Portfolio.getByUser(tgUser)
+  let amountTotal = 0
+  let costBasis = 0
+  let cost = 0
+  let profitMoney = 0
+  let profitProcent = 0
+
+  if (portfolio.length > 0) {
+    portfolio.forEach((share) => {
+      amountTotal += share.amount
+      costBasis += share.costBasis * share.amount
+      cost += share.stock.price * share.amount
+      profitMoney += (share.stock.price * share.amount) - (share.costBasis * share.amount)
+    })
+  }
+
+  profitProcent = (profitMoney / costBasis) * 100
+
+  return {
+    shares: amountTotal,
+    costBasis: parseFloat(costBasis.toFixed(5)),
+    cost: parseFloat(cost.toFixed(5)),
+    profitMoney: parseFloat(profitMoney.toFixed(5)),
+    profitProcent: parseFloat(profitProcent.toFixed(2)),
+  }
 }
 
 db.Portfolio.buy = async (tgUser, peer, basicAmount) => {
@@ -187,6 +214,7 @@ db.Stock.update = async (peer) => {
   let price = ((channel.full.participants_count / 25000) * (viewsAvg / 50000)) / 1000
 
   price += (price * (stockPorfolio.length / 7500))
+  if (price < 0 || Number.isNaN(price)) price = 0
   price = parseFloat(price.toFixed(5))
 
   const stock = await db.Stock.get(peer)

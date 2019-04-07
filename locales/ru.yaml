@@ -2,6 +2,13 @@ profile:
   info: |
     <b>Имя:</b> ${name}
     <b>Баланс:</b> ${balance}💲
+
+    <b>Портфолио</b>
+      Количество: ${shares}
+      Стоимость: ${costBasis}💲 > ${cost}💲
+      Прибыль/Убыток: ${profitMoney}💲 (${profitProcent}%)
+
+    📅 <b>Возраст аккаунта:</b> ${accountAge}
   btn:
     profile: 👤 Профиль
     portfolio: 💼 Портфолио
@@ -18,7 +25,7 @@ stock:
   shares: |
     <b>Акций:</b>
       Количество: ${shares}
-      Стоимость: ${basicCost}💲 > ${cost}💲
+      Стоимость: ${costBasis}💲 > ${cost}💲
       Прибыль/Убыток: ${profitMoney}💲 (${profitProcent}%)
   btn:
     update: Обновить

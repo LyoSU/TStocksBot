@@ -32,15 +32,15 @@ module.exports = async (ctx) => {
   const stock = await ctx.db.Stock.get(peer)
   const portfolios = await ctx.db.Portfolio.getByStockUser(ctx.from, peer)
 
-  let totalAmount = 0
-  let totalCost = 0
+  let amountTotal = 0
+  let costBasis = 0
   let profitMoney = 0
   let profitProcent = 0
 
   if (portfolios.length > 0) {
     portfolios.forEach((portfolio) => {
-      totalAmount += portfolio.amount
-      totalCost += portfolio.costBasis * portfolio.amount
+      amountTotal += portfolio.amount
+      costBasis += portfolio.costBasis * portfolio.amount
     })
   }
 
@@ -74,8 +74,8 @@ module.exports = async (ctx) => {
             symbol: result.portfolio.stock.symbol,
           })
 
-          totalAmount += result.amount
-          totalCost += result.costBasis * result.amount
+          amountTotal += result.amount
+          costBasis += result.costBasis * result.amount
         }
         else if (result.error === 'MONEY_ERROR') {
           answerText = ctx.i18n.t('stock.answer.buy.error.money')
@@ -95,8 +95,8 @@ module.exports = async (ctx) => {
             symbol: result.stock.symbol,
           })
 
-          totalAmount -= result.amount
-          totalCost -= result.costBasis * result.amount
+          amountTotal -= result.amount
+          costBasis -= result.costBasis * result.amount
         }
         else if (result.error === 'NOT_FOUND') {
           answerText = ctx.i18n.t('stock.answer.sell.error.not_found')
@@ -118,14 +118,14 @@ module.exports = async (ctx) => {
   if (stock) {
     let shares = ctx.i18n.t('stock.error.no_shares')
 
-    if (totalAmount > 0) {
-      profitMoney = (stock.price * totalAmount) - totalCost
-      profitProcent = (profitMoney / totalCost) * 100
+    if (amountTotal > 0) {
+      profitMoney = (stock.price * amountTotal) - costBasis
+      profitProcent = (profitMoney / costBasis) * 100
 
       shares = ctx.i18n.t('stock.shares', {
-        shares: totalAmount,
-        basicCost: totalCost.toFixed(5),
-        cost: (totalAmount * stock.price).toFixed(5),
+        shares: amountTotal,
+        costBasis: costBasis.toFixed(5),
+        cost: (amountTotal * stock.price).toFixed(5),
         profitMoney: profitMoney.toFixed(5),
         profitProcent: profitProcent.toFixed(5),
       })
