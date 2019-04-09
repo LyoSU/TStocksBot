@@ -123,21 +123,25 @@ db.Portfolio.buy = async (tgUser, peer, basicAmount) => {
   }
 }
 
-db.Portfolio.sell = async (tgUser, peer, amount) => {
+db.Portfolio.sell = async (tgUser, peer, needAmount) => {
   let sellAmount = 0
   const user = await db.User.get(tgUser)
   const portfolio = await db.Portfolio.getByStockUser(tgUser, peer)
 
   if (portfolio.length > 0) {
-    if (portfolio[0].amount <= amount) {
-      portfolio[0].remove()
-      sellAmount = portfolio[0].amount
-    }
-    else {
-      portfolio[0].amount -= amount
-      portfolio[0].save()
-      sellAmount = amount
-    }
+    portfolio.forEach((share) => {
+      if (sellAmount >= needAmount) return
+      if (share.amount <= (needAmount - sellAmount)) {
+        share.remove()
+        sellAmount += share.amount
+      }
+      else {
+        // eslint-disable-next-line no-param-reassign
+        share.amount -= (needAmount - sellAmount)
+        share.save()
+        sellAmount += (needAmount - sellAmount)
+      }
+    })
 
     if (sellAmount > 0) {
       // eslint-disable-next-line max-len

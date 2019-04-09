@@ -72,6 +72,7 @@ module.exports = async (ctx) => {
         if (result.portfolio) {
           answerText = ctx.i18n.t('stock.answer.buy.suc', {
             symbol: result.portfolio.stock.symbol,
+            amount: result.amount,
           })
 
           amountTotal += result.amount
@@ -88,11 +89,12 @@ module.exports = async (ctx) => {
         break
       }
       case 'sell': {
-        result = await ctx.db.Portfolio.sell(ctx.from, peer, arg[2])
+        result = await ctx.db.Portfolio.sell(ctx.from, peer, parseInt(arg[2], 10))
 
         if (result.stock) {
           answerText = ctx.i18n.t('stock.answer.sell.suc', {
             symbol: result.stock.symbol,
+            amount: result.amount,
           })
 
           amountTotal -= result.amount
