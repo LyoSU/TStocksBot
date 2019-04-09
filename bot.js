@@ -76,9 +76,9 @@ bot.action(/stock:(.*)/, rateLimit(moneyLimitConfig), handleStock)
 
 bot.on('text', handleProfile)
 
-// bot.catch((error) => {
-//   console.log('Ooops', error)
-// })
+bot.catch((error) => {
+  console.log('Ooops', error)
+})
 
 bot.launch()
 

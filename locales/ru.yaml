@@ -35,13 +35,13 @@ stock:
     update:
       suc: Обновлено
     buy:
-      suc: Ты успешно купил акцию $${symbol}
+      suc: Ты успешно купил акцию $${symbol} (${amount})
       error:
         money: |
           Ошибка!
           У тебя недостаточно денег для совершения покупки
     sell:
-      suc: Ты успешно продал акцию $${symbol}
+      suc: Ты успешно продал акцию $${symbol} (${amount})
       error:
         not_found: |
           Ошибка!
