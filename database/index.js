@@ -77,9 +77,8 @@ db.Portfolio.getValue = async (tgUser) => {
       cost += share.stock.price * share.amount
       profitMoney += (share.stock.price * share.amount) - (share.costBasis * share.amount)
     })
+    profitProcent = (profitMoney / costBasis) * 100
   }
-
-  profitProcent = (profitMoney / costBasis) * 100
 
   return {
     shares: amountTotal,
@@ -145,7 +144,7 @@ db.Portfolio.sell = async (tgUser, peer, needAmount) => {
 
     if (sellAmount > 0) {
       // eslint-disable-next-line max-len
-      user.balance += (portfolio.stock.price * sellAmount) - (portfolio.stock.price * (global.gameConfig.sellFee / 100))
+      user.balance += (portfolio.stock.price * sellAmount) - (portfolio.stock.price * global.gameConfig.sellFee)
       user.save()
     }
 
@@ -217,7 +216,15 @@ db.Stock.update = async (peer) => {
 
   let price = ((channel.full.participants_count / 25000) * (viewsAvg / 50000)) / 1000
 
-  price += (price * (stockPorfolio.length / 7500))
+  if (stockPorfolio.length > 0) {
+    let costPorfolio = 0
+
+    stockPorfolio.forEach((share) => {
+      costPorfolio += share.costBasis
+    })
+    price += ((costPorfolio * global.gameConfig.sellFee) / 100)
+  }
+
   if (price < 0 || Number.isNaN(price)) price = 0
   price = parseFloat(price.toFixed(5))
 

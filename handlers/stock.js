@@ -148,6 +148,7 @@ module.exports = async (ctx) => {
         Markup.callbackButton('1', `stock:${stock.symbol}.amount.1`),
         Markup.callbackButton('10', `stock:${stock.symbol}.amount.10`),
         Markup.callbackButton('100', `stock:${stock.symbol}.amount.100`),
+        Markup.callbackButton('1000', `stock:${stock.symbol}.amount.1000`),
       ],
       [
         Markup.callbackButton(ctx.i18n.t('stock.btn.buy'), `stock:${stock.symbol}.buy.${ctx.session.stack.amount}`),
@@ -175,5 +176,10 @@ module.exports = async (ctx) => {
         reply_markup: markup,
       })
     }
+  }
+  else {
+    const text = 'none'
+
+    ctx.replyWithHTML(text)
   }
 }

@@ -4,6 +4,8 @@ const { userName } = require('../utils')
 
 
 module.exports = async (ctx) => {
+  ctx.session = null
+
   const value = await ctx.db.Portfolio.getValue(ctx.from)
 
   const accountAge = humanizeDuration(
@@ -14,8 +16,6 @@ module.exports = async (ctx) => {
       language: ctx.i18n.locale(),
     }
   )
-
-  console.log(value)
 
   ctx.replyWithHTML(ctx.i18n.t('profile.info', {
     name: userName(ctx.from),
@@ -36,6 +36,4 @@ module.exports = async (ctx) => {
       ctx.i18n.t('profile.btn.top'),
     ],
   ]).resize().extra())
-
-  ctx.session = null
 }
