@@ -68,6 +68,6 @@ channels:
     <b>Топ каналов:</b>
     ${channelsText}
   stock:
-    \n/s_${symbol} - ${price}💲
+    \n${num}/s_${symbol} - ${price}💲
 error:
   unknown: Неизвестная ошибка
