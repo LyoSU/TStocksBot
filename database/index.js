@@ -99,7 +99,7 @@ db.Portfolio.buy = async (tgUser, peer, basicAmount) => {
     amount = Math.floor(user.balance / stock.price)
   }
 
-  if (amount > 0) {
+  if (amount > 0 && stock.price > 0) {
     user.balance -= stock.price * amount
     user.save()
 
@@ -166,9 +166,9 @@ db.Stock.get = async (peer) => {
 
   let stock
 
-  if (!username) stock = await db.Stock.findOne({ username: { $regex: new RegExp(peer, 'i') } })
+  if (!username) stock = await db.Stock.findOne({ username: { $regex: `^${peer}$`, $options: 'i' } })
   else if (username[1]) stock = await db.Stock.findOne({ symbol: username[1].toUpperCase() })
-  else if (username[2]) stock = await db.Stock.findOne({ username: { $regex: new RegExp(username[2], 'i') } })
+  else if (username[2]) stock = await db.Stock.findOne({ username: { $regex: `^${username[2]}$`, $options: 'i' } })
 
   if (!stock && username && username[2]) {
     const channel = await channelParse(username[2])
@@ -189,8 +189,8 @@ db.Stock.get = async (peer) => {
 }
 
 
-db.Stock.getTop = async () => {
-  const stock = await db.Stock.find().skip(0).limit(10).sort({ price: -1 })
+db.Stock.getTop = async (skip = 0, limit = 10) => {
+  const stock = await db.Stock.find().skip(skip).limit(limit).sort({ price: -1 })
 
   return stock
 }
