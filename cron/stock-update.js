@@ -5,8 +5,6 @@ const {
 
 
 db.Stock.update('telegram')
-db.Stock.update('PresidentPoroshenko')
-db.Stock.update('lyblog')
 
 module.exports = () => {
   const job = new CronJob('0 */5 * * * *', (async () => {
