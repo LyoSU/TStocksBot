@@ -236,13 +236,13 @@ db.Stock.update = async (peer) => {
   }
 
   if (stockPorfolio.length > 0) {
-    let costBasis = 0
+    let portfolioTotalCost = 0
 
     stockPorfolio.forEach((share) => {
-      costBasis += share.costBasis * share.amount
+      portfolioTotalCost += share.costBasis * share.amount
     })
 
-    price += ((costBasis * global.gameConfig.sellFee) / 100)
+    price += ((portfolioTotalCost * global.gameConfig.sellFee) / 100)
   }
 
   const now = new Date()
