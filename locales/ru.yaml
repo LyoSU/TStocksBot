@@ -1,12 +1,14 @@
 profile:
   info: |
-    <b>Имя:</b> ${name}
-    <b>Баланс:</b> ${balance}💲
+    👤 <b>Имя:</b> ${name}
+    🏦 <b>Баланс:</b> ${balance}💲
 
-    <b>Портфолио</b>
+    💼 <b>Портфолио</b>
       Количество: ${shares}
       Стоимость: ${costBasis}💲 > ${cost}💲
       Прибыль/Убыток: ${profitMoney}💲 (${profitProcent}%)
+
+    💰 Капитал: ${capital}💲
 
     📅 <b>Возраст аккаунта:</b> ${accountAge}
   btn:
@@ -58,10 +60,10 @@ stock:
       Канал не найден
 portfolio:
   info: |
-    <b>Портфолио ${name}</b>
-    ${portfolio}
+    💼 <b>Портфолио ${name}</b>
+    ${portfolioText}
   stock:
-    \n/s_${symbol} - ${baseCost}💲 > ${cost}💲
+    \n/s_${symbol} - ${costBasis}💲 > ${cost}💲 <i>${profitProcent}%</i>
   error:
     empty: Ты ещё не приобрел ни одной акции
 channels:

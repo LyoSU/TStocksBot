@@ -25,6 +25,7 @@ module.exports = async (ctx) => {
     cost: value.cost,
     profitMoney: value.profitMoney,
     profitProcent: value.profitProcent,
+    capital: ctx.user.balance + value.cost,
     accountAge,
   }), Markup.keyboard([
     [
