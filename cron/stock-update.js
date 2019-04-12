@@ -7,7 +7,7 @@ const {
 db.Stock.update('telegram')
 
 module.exports = () => {
-  const job = new CronJob('*/30 * * * * *', (async () => {
+  const job = new CronJob('0 */5 * * * *', (async () => {
     const stocks = await db.Stock.find()
 
     stocks.forEach(async (stock, index) => {
