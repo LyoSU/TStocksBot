@@ -25,9 +25,18 @@ const stockSchema = mongoose.Schema({
   price: Float,
   stats: {
     day: {
-      chart: String,
-      profitMoney: Float,
-      profitProcent: Float,
+      chart: {
+        type: String,
+        default: '',
+      },
+      profitMoney: {
+        type: Float,
+        default: 0,
+      },
+      profitProcent: {
+        type: Float,
+        default: 0,
+      },
     },
   },
 }, {
