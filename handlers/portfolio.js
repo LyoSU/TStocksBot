@@ -33,7 +33,7 @@ module.exports = async (ctx) => {
         symbol: stock.stock.symbol,
         costBasis: stock.costBasis.toFixed(5),
         cost: cost.toFixed(5),
-        profitProcent,
+        profitProcent: profitProcent.toFixed(2),
       })
     })
 
