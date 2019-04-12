@@ -1,6 +1,8 @@
-const cronStockUpdate = require('./stock-update')
+const cronStockUpdate = require('./stock')
+const topUpdate = require('./top')
 
 
-module.exports = {
-  cronStockUpdate,
+module.exports = async () => {
+  cronStockUpdate()
+  topUpdate()
 }

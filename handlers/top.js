@@ -1,3 +1,18 @@
 module.exports = async (ctx) => {
-  ctx.replyWithHTML(ctx.i18n.t('top.info'))
+  const topUser = JSON.parse(await ctx.redis.get('topUser'))
+  let num = 1
+  let topText = ''
+
+  if (topUser && topUser.length > 5) {
+    topUser.forEach((user) => {
+      topText += ctx.i18n.t('top.user', {
+        num: `${num++}. `,
+        name: user.name,
+        capital: user.capital,
+      })
+    })
+
+    ctx.replyWithHTML(ctx.i18n.t('top.info', { topText }))
+  }
+  else ctx.replyWithHTML(ctx.i18n.t('top.error.empty'))
 }

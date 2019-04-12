@@ -6,7 +6,7 @@ const {
 
 db.Stock.update('telegram')
 
-module.exports = () => {
+module.exports = async () => {
   const job = new CronJob('0 */5 * * * *', (async () => {
     const stocks = await db.Stock.find()
 

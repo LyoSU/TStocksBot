@@ -72,5 +72,14 @@ channels:
     ${channelsText}
   stock:
     \n${num}/s_${symbol} - ${price}💲 <i>${profitProcent}%</i>
+top:
+  info: |
+    <b>Топ игроков:</b>
+    ${topText}
+  user:
+    \n${num} ${name} - ${capital}💲
+  error:
+    empty:
+      Слишком мало игроков или топ ещё не сформирован...
 error:
   unknown: Неизвестная ошибка
