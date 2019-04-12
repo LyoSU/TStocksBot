@@ -8,7 +8,7 @@ module.exports = async (ctx) => {
       topText += ctx.i18n.t('top.user', {
         num: `${num++}. `,
         name: user.name,
-        capital: user.capital,
+        capital: user.capital.toFixed(5),
       })
     })
 
