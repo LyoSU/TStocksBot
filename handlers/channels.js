@@ -8,6 +8,7 @@ module.exports = async (ctx) => {
       num: `${num++}. `,
       symbol: stock.symbol,
       price: stock.price,
+      profitProcent: stock.stats.day.profitProcent.toFixed(2),
     })
   })
 
