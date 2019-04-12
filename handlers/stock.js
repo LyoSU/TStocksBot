@@ -30,94 +30,96 @@ module.exports = async (ctx) => {
   }
 
   const stock = await ctx.db.Stock.get(peer)
-  const portfolios = await ctx.db.Portfolio.getByStockUser(ctx.from, peer)
 
-  let amountTotal = 0
-  let costBasis = 0
-  let profitMoney = 0
-  let profitProcent = 0
+  if (stock && !stock.error) {
+    const portfolios = await ctx.db.Portfolio.getByStockUser(ctx.from, peer)
 
-  if (portfolios.length > 0) {
-    portfolios.forEach((portfolio) => {
-      amountTotal += portfolio.amount
-      costBasis += portfolio.costBasis * portfolio.amount
-    })
-  }
+    let amountTotal = 0
+    let costBasis = 0
+    let profitMoney = 0
+    let profitProcent = 0
 
-  if (ctx.callbackQuery) {
-    let result = ''
+    if (portfolios.length > 0) {
+      portfolios.forEach((share) => {
+        amountTotal += share.amount
+        costBasis += share.costBasis * share.amount
+      })
+    }
 
-    switch (arg[1]) {
-      case 'amount': {
-        answerText = ''
+    if (ctx.callbackQuery) {
+      let result = ''
 
-        if (arg[2] === 'plus') ctx.session.stack.sign = 'minus'
-        else if (arg[2] === 'minus') ctx.session.stack.sign = 'plus'
-        else if (ctx.session.stack.sign === 'plus') ctx.session.stack.amount += parseInt(arg[2], 10)
-        else if (ctx.session.stack.sign === 'minus') ctx.session.stack.amount -= parseInt(arg[2], 10)
+      switch (arg[1]) {
+        case 'amount': {
+          answerText = ''
 
-        if (ctx.session.stack.amount < 1) ctx.session.stack.amount = 1
+          if (arg[2] === 'plus') ctx.session.stack.sign = 'minus'
+          else if (arg[2] === 'minus') ctx.session.stack.sign = 'plus'
+          else if (ctx.session.stack.sign === 'plus') ctx.session.stack.amount += parseInt(arg[2], 10)
+          else if (ctx.session.stack.sign === 'minus') ctx.session.stack.amount -= parseInt(arg[2], 10)
 
-        break
-      }
-      case 'update': {
-        answerText = ctx.i18n.t('stock.answer.update.suc')
-        break
-      }
-      case 'buy': {
-        const amount = parseInt(arg[2], 10)
+          if (ctx.session.stack.amount < 1) ctx.session.stack.amount = 1
 
-        result = await ctx.db.Portfolio.buy(ctx.from, peer, amount)
-
-        if (result.portfolio) {
-          answerText = ctx.i18n.t('stock.answer.buy.suc', {
-            symbol: result.portfolio.stock.symbol,
-            amount: result.amount,
-          })
-
-          amountTotal += result.amount
-          costBasis += result.costBasis * result.amount
+          break
         }
-        else if (result.error === 'MONEY_ERROR') {
-          answerText = ctx.i18n.t('stock.answer.buy.error.money')
-          showAlert = true
+        case 'update': {
+          answerText = ctx.i18n.t('stock.answer.update.suc')
+          break
         }
-        else {
+        case 'buy': {
+          const amount = parseInt(arg[2], 10)
+
+          result = await ctx.db.Portfolio.buy(ctx.from, peer, amount)
+
+          if (result.portfolio) {
+            answerText = ctx.i18n.t('stock.answer.buy.suc', {
+              symbol: result.portfolio.stock.symbol,
+              amount: result.amount,
+            })
+
+            amountTotal += result.amount
+            costBasis += result.costBasis * result.amount
+          }
+          else if (result.error === 'MONEY_ERROR') {
+            answerText = ctx.i18n.t('stock.answer.buy.error.money')
+            showAlert = true
+          }
+          else {
+            answerText = ctx.i18n.t('error.unknown')
+            showAlert = true
+          }
+          break
+        }
+        case 'sell': {
+          result = await ctx.db.Portfolio.sell(ctx.from, peer, parseInt(arg[2], 10))
+
+          if (result.stock) {
+            answerText = ctx.i18n.t('stock.answer.sell.suc', {
+              symbol: result.stock.symbol,
+              amount: result.amount,
+            })
+
+            amountTotal -= result.amount
+            costBasis -= result.costBasis * result.amount
+          }
+          else if (result.error === 'NOT_FOUND') {
+            answerText = ctx.i18n.t('stock.answer.sell.error.not_found')
+            showAlert = true
+          }
+          else {
+            answerText = ctx.i18n.t('error.unknown')
+            showAlert = true
+          }
+          break
+        }
+        default: {
           answerText = ctx.i18n.t('error.unknown')
           showAlert = true
         }
-        break
-      }
-      case 'sell': {
-        result = await ctx.db.Portfolio.sell(ctx.from, peer, parseInt(arg[2], 10))
-
-        if (result.stock) {
-          answerText = ctx.i18n.t('stock.answer.sell.suc', {
-            symbol: result.stock.symbol,
-            amount: result.amount,
-          })
-
-          amountTotal -= result.amount
-          costBasis -= result.costBasis * result.amount
-        }
-        else if (result.error === 'NOT_FOUND') {
-          answerText = ctx.i18n.t('stock.answer.sell.error.not_found')
-          showAlert = true
-        }
-        else {
-          answerText = ctx.i18n.t('error.unknown')
-          showAlert = true
-        }
-        break
-      }
-      default: {
-        answerText = ctx.i18n.t('error.unknown')
-        showAlert = true
       }
     }
-  }
 
-  if (stock) {
+
     let shares = ctx.i18n.t('stock.error.no_shares')
 
     if (amountTotal > 0) {
@@ -138,7 +140,9 @@ module.exports = async (ctx) => {
       username: stock.username,
       symbol: stock.symbol,
       price: stock.price,
-      chart: stock.charts.day,
+      chart: stock.stats.day.chart,
+      profitMoney: stock.stats.day.profitMoney.toFixed(5),
+      profitProcent: stock.stats.day.profitProcent.toFixed(5),
       shares,
     })
 
@@ -178,8 +182,6 @@ module.exports = async (ctx) => {
     }
   }
   else {
-    const text = 'none'
-
-    ctx.replyWithHTML(text)
+    ctx.replyWithHTML(ctx.i18n.t('stock.error.not_found'))
   }
 }
