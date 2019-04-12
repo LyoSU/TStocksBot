@@ -20,6 +20,7 @@ stock:
 
     <b>Символ:</b> $${symbol}
     <b>Цена:</b> ${price}💲
+    За сутик: ${profitMoney}💲 (${profitProcent}%)
 
     ${shares}
   shares: |

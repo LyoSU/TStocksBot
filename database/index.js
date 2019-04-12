@@ -170,18 +170,22 @@ db.Stock.get = async (peer) => {
   else if (username[2]) stock = await db.Stock.findOne({ username: { $regex: `^${username[2]}$`, $options: 'i' } })
 
   if (!stock && username && username[2]) {
-    const channel = await channelParse(username[2])
-
-    if (channel.type === 'channel') {
-      const symbol = channel.Chat.username.replace(/[_aeiou0-9]/ig, '').substr(0, 5).toUpperCase()
-
-      stock = new db.Stock()
-      stock.channelId = channel.channel_id
-      stock.symbol = symbol
-      stock.username = channel.Chat.username
-      stock.title = channel.Chat.title
-      await stock.save()
+    return {
+      error: 'NOT_FOUND',
     }
+
+    // const channel = await channelParse(username[2])
+
+    // if (channel.type === 'channel') {
+    //   const symbol = channel.Chat.username.replace(/[_aeiou0-9]/ig, '').substr(0, 5).toUpperCase()
+
+    //   stock = new db.Stock()
+    //   stock.channelId = channel.channel_id
+    //   stock.symbol = symbol
+    //   stock.username = channel.Chat.username
+    //   stock.title = channel.Chat.title
+    //   await stock.save()
+    // }
   }
 
   return stock
@@ -216,15 +220,6 @@ db.Stock.update = async (peer) => {
 
   let price = ((channel.full.participants_count / 25000) * (viewsAvg / 50000)) / 1000
 
-  if (stockPorfolio.length > 0) {
-    let costPorfolio = 0
-
-    stockPorfolio.forEach((share) => {
-      costPorfolio += share.costBasis
-    })
-    price += ((costPorfolio * global.gameConfig.sellFee) / 100)
-  }
-
   if (price < 0 || Number.isNaN(price)) price = 0
   price = parseFloat(price.toFixed(5))
 
@@ -238,6 +233,16 @@ db.Stock.update = async (peer) => {
     history.price = price
     await history.save()
     stock.price = price
+  }
+
+  if (stockPorfolio.length > 0) {
+    let costBasis = 0
+
+    stockPorfolio.forEach((share) => {
+      costBasis += share.costBasis * share.amount
+    })
+
+    price += ((costBasis * global.gameConfig.sellFee) / 100)
   }
 
   const now = new Date()
@@ -290,7 +295,13 @@ db.Stock.update = async (peer) => {
     const image = await canvasRenderService.renderToBuffer(configuration)
     const upload = await uploadFile(image)
 
-    stock.charts.day = `telegra.ph${upload[0].src}`
+    const costBasis = his[0].price
+    const profitMoney = price - costBasis
+    const profitProcent = (profitMoney / costBasis) * 100
+
+    stock.stats.day.chart = `telegra.ph${upload[0].src}`
+    stock.stats.day.profitMoney = profitMoney
+    stock.stats.day.profitProcent = profitProcent
   }
 
   await stock.save()

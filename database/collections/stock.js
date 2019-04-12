@@ -23,8 +23,12 @@ const stockSchema = mongoose.Schema({
   },
   title: String,
   price: Float,
-  charts: {
-    day: String,
+  stats: {
+    day: {
+      chart: String,
+      profitMoney: Float,
+      profitProcent: Float,
+    },
   },
 }, {
   timestamps: true,
