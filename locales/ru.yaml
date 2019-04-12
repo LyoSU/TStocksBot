@@ -20,7 +20,7 @@ stock:
 
     <b>Символ:</b> $${symbol}
     <b>Цена:</b> ${price}💲
-    За сутик: ${profitMoney}💲 (${profitProcent}%)
+      За сутки: ${profitMoney}💲 (${profitProcent}%)
 
     ${shares}
   shares: |
@@ -69,6 +69,6 @@ channels:
     <b>Топ каналов:</b>
     ${channelsText}
   stock:
-    \n${num}/s_${symbol} - ${price}💲
+    \n${num}/s_${symbol} - ${price}💲 <i>${profitProcent}%</i>
 error:
   unknown: Неизвестная ошибка

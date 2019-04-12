@@ -142,7 +142,7 @@ module.exports = async (ctx) => {
       price: stock.price,
       chart: stock.stats.day.chart,
       profitMoney: stock.stats.day.profitMoney.toFixed(5),
-      profitProcent: stock.stats.day.profitProcent.toFixed(5),
+      profitProcent: stock.stats.day.profitProcent.toFixed(2),
       shares,
     })
 
