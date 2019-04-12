@@ -4,39 +4,42 @@ const {
 
 
 module.exports = async (ctx) => {
-  const portfolioGet = await ctx.db.Portfolio.getByUser(ctx.from)
+  const portfolio = await ctx.db.Portfolio.getByUser(ctx.from)
   let resultText = ''
 
-  if (portfolioGet.length > 0) {
+  if (portfolio.length > 0) {
     const portfolioStock = {}
-    let portfolio = ''
+    let portfolioText = ''
 
-    portfolioGet.forEach((share) => {
+    portfolio.forEach((share) => {
       if (!portfolioStock[share.stock.id]) {
         portfolioStock[share.stock.id] = {
-          count: 0,
-          cost: 0,
+          amount: 0,
+          costBasis: 0,
           stock: share.stock,
         }
       }
-      portfolioStock[share.stock.id].count++
-      portfolioStock[share.stock.id].cost += share.costBasis
+      portfolioStock[share.stock.id].amount += share.amount
+      portfolioStock[share.stock.id].costBasis += share.costBasis * share.amount
     })
 
     Object.keys(portfolioStock).forEach((stockId) => {
-      const baseCost = portfolioStock[stockId].cost
-      const cost = portfolioStock[stockId].stock.price * portfolioStock[stockId].count
+      const stock = portfolioStock[stockId]
+      const cost = stock.stock.price * stock.amount
+      const profitMoney = cost - stock.costBasis
+      const profitProcent = (profitMoney / stock.costBasis) * 100
 
-      portfolio += ctx.i18n.t('portfolio.stock', {
-        symbol: portfolioStock[stockId].stock.symbol,
-        baseCost: baseCost.toFixed(5),
+      portfolioText += ctx.i18n.t('portfolio.stock', {
+        symbol: stock.stock.symbol,
+        costBasis: stock.costBasis.toFixed(5),
         cost: cost.toFixed(5),
+        profitProcent,
       })
     })
 
     resultText = ctx.i18n.t('portfolio.info', {
       name: userName(ctx.from),
-      portfolio,
+      portfolioText,
     })
   }
   else {
