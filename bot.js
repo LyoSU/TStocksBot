@@ -1,5 +1,6 @@
 const path = require('path')
 const Telegraf = require('telegraf')
+const Redis = require('ioredis')
 const RedisSession = require('telegraf-session-redis')
 const rateLimit = require('telegraf-ratelimit')
 const I18n = require('telegraf-i18n')
@@ -16,9 +17,7 @@ const {
   handlePortfolio,
   handleTop,
 } = require('./handlers')
-const {
-  cronStockUpdate,
-} = require('./cron')
+const cron = require('./cron')
 
 
 const {
@@ -35,14 +34,17 @@ bot.telegram.getMe().then((botInfo) => {
   bot.options.username = botInfo.username
 })
 
+const redis = new Redis({ keyPrefix: `${process.env.REDIS_PREFIX}:` })
+
 const session = new RedisSession({
   store: {
-    prefix: 'TStocksBot:',
+    prefix: `${process.env.REDIS_PREFIX}:session:`,
   },
 })
 
 bot.use(session)
 
+bot.context.redis = redis
 bot.context.db = db
 
 const i18n = new I18n({
@@ -84,4 +86,4 @@ bot.launch()
 
 console.log('bot start')
 
-cronStockUpdate()
+cron()

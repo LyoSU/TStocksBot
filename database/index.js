@@ -16,7 +16,11 @@ Object.keys(collections).forEach((collectionName) => {
 
 
 db.User.get = async (tgUser) => {
-  let user = await db.User.findOne({ telegram_id: tgUser.id })
+  let telegramId = tgUser.id
+
+  if (tgUser.telegram_id) telegramId = tgUser.telegram_id
+
+  let user = await db.User.findOne({ telegram_id: telegramId })
 
   if (!user) {
     user = new db.User()
@@ -206,7 +210,7 @@ db.Stock.update = async (peer) => {
 
   const nowUnix = Math.floor(Date.now() / 1000)
 
-  await channel.messages.forEach((message) => {
+  channel.messages.forEach((message) => {
     if (!message.fwd_from && message.date < (nowUnix - 3600) && totalMessage < 50) {
       if (message.views) {
         totalMessage++
@@ -255,7 +259,7 @@ db.Stock.update = async (peer) => {
       $gte: gte,
       $lte: lte,
     },
-  })
+  }).sort({ time: 1 })
 
   if (his.length > 1) {
     const labels = []
