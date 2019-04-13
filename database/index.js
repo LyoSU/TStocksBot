@@ -227,6 +227,16 @@ db.Stock.update = async (peer) => {
   if (price < 0 || Number.isNaN(price)) price = 0
   price = parseFloat(price.toFixed(5))
 
+  if (stockPorfolio.length > 0) {
+    let portfolioTotalCost = 0
+
+    stockPorfolio.forEach((share) => {
+      portfolioTotalCost += share.costBasis * share.amount
+    })
+
+    price += ((portfolioTotalCost * global.gameConfig.sellFee) / 1000)
+  }
+
   const stock = await db.Stock.get(peer)
 
   stock.title = channel.Chat.title
@@ -237,16 +247,6 @@ db.Stock.update = async (peer) => {
     history.price = price
     await history.save()
     stock.price = price
-  }
-
-  if (stockPorfolio.length > 0) {
-    let portfolioTotalCost = 0
-
-    stockPorfolio.forEach((share) => {
-      portfolioTotalCost += share.costBasis * share.amount
-    })
-
-    price += ((portfolioTotalCost * global.gameConfig.sellFee) / 100)
   }
 
   const now = new Date()
