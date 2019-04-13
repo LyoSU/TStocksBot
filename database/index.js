@@ -83,7 +83,7 @@ db.Portfolio.getValue = async (tgUser) => {
         profitMoney += (share.stock.price * share.amount) - (share.costBasis * share.amount)
       }
       else {
-        console.log(`error ${share.stock}`)
+        console.log(`error ${share}`)
       }
     })
     profitProcent = (profitMoney / costBasis) * 100
