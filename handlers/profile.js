@@ -25,7 +25,7 @@ module.exports = async (ctx) => {
     cost: value.cost.toFixed(5),
     profitMoney: value.profitMoney.toFixed(5),
     profitProcent: value.profitProcent.toFixed(2),
-    capital: ctx.user.balance + value.cost.toFixed(5),
+    capital: (ctx.user.balance + value.cost).toFixed(5),
     accountAge,
   }), Markup.keyboard([
     [
