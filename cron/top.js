@@ -10,7 +10,7 @@ const {
 const redis = new Redis({ keyPrefix: `${process.env.REDIS_PREFIX}:` })
 
 module.exports = async () => {
-  const job = new CronJob('0 */10 * * * *', (async () => {
+  const job = new CronJob('0 */1 * * * *', (async () => {
     const topUser = []
     const allUser = await db.User.find()
 
@@ -26,6 +26,8 @@ module.exports = async () => {
     }
 
     topUser.sort((a, b) => b.capital - a.capital)
+
+    console.log(topUser.slice(0, 10))
 
     redis.set('topUser', JSON.stringify(topUser.slice(0, 10)))
   }))
