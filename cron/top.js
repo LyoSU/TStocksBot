@@ -27,8 +27,6 @@ module.exports = async () => {
 
     topUser.sort((a, b) => b.capital - a.capital)
 
-    console.log(topUser.slice(0, 10))
-
     redis.set('topUser', JSON.stringify(topUser.slice(0, 10)))
   }))
 
