@@ -11,6 +11,7 @@ const {
   userUpdate,
 } = require('./middlewares')
 const {
+  handleHelp,
   handleProfile,
   handleStock,
   handleChannels,
@@ -68,6 +69,7 @@ bot.use(async (ctx, next) => {
   console.log('Response time %sms', ms)
 })
 
+bot.hears(['/profile', match('profile.btn.profile')], handleProfile)
 bot.hears((['/portfolio', match('profile.btn.portfolio')]), handlePortfolio)
 bot.hears(['/channels', match('profile.btn.channels')], handleChannels)
 bot.hears((['/top', match('profile.btn.top')]), handleTop)
@@ -76,7 +78,7 @@ bot.hears(/(?:\$(\w{2,32})|(?:(?:t\.me)\/|(\/s_|@))(\w{2,32}))/, handleStock)
 
 bot.action(/stock:(.*)/, rateLimit(moneyLimitConfig), handleStock)
 
-bot.on('text', handleProfile)
+bot.on('text', handleHelp)
 
 bot.catch((error) => {
   console.log('Ooops', error)
