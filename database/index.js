@@ -234,7 +234,7 @@ db.Stock.update = async (peer) => {
       portfolioTotalCost += share.costBasis * share.amount
     })
 
-    price += ((portfolioTotalCost * global.gameConfig.sellFee) / 1000)
+    price += (portfolioTotalCost * (global.gameConfig.sellFee / 100000))
   }
 
   const stock = await db.Stock.get(peer)
