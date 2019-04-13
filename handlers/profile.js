@@ -19,13 +19,13 @@ module.exports = async (ctx) => {
 
   ctx.replyWithHTML(ctx.i18n.t('profile.info', {
     name: userName(ctx.from),
-    balance: ctx.user.balance,
+    balance: ctx.user.balance.toFixed(5),
     shares: value.shares,
-    costBasis: value.costBasis,
-    cost: value.cost,
-    profitMoney: value.profitMoney,
-    profitProcent: value.profitProcent,
-    capital: ctx.user.balance + value.cost,
+    costBasis: value.costBasis.toFixed(5),
+    cost: value.cost.toFixed(5),
+    profitMoney: value.profitMoney.toFixed(5),
+    profitProcent: value.profitProcent.toFixed(2),
+    capital: ctx.user.balance + value.cost.toFixed(5),
     accountAge,
   }), Markup.keyboard([
     [
