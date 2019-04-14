@@ -26,7 +26,7 @@ const {
 } = I18n
 
 global.gameConfig = {
-  sellFee: 0.25,
+  sellFee: 0.15,
 }
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
