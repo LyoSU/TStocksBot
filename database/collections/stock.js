@@ -21,7 +21,10 @@ const stockSchema = mongoose.Schema({
     unique: true,
     required: true,
   },
-  title: String,
+  title: {
+    type: String,
+    default: 'untitled',
+  },
   available: {
     type: Boolean,
     default: false,
@@ -30,7 +33,10 @@ const stockSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  price: Float,
+  price: {
+    type: Float,
+    default: 0,
+  },
   stats: {
     day: {
       chart: {
