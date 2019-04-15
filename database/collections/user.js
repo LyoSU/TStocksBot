@@ -16,6 +16,9 @@ const userSchema = mongoose.Schema({
     type: Float,
     default: 100,
   },
+  admin_rights: {
+    add_admin: Boolean,
+  },
 }, {
   timestamps: true,
 })

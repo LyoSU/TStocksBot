@@ -183,22 +183,22 @@ db.Stock.get = async (peer) => {
   else if (username[2]) stock = await db.Stock.findOne({ username: { $regex: `^${username[2]}$`, $options: 'i' } })
 
   if (!stock && username && username[2]) {
-    return {
-      error: 'NOT_FOUND',
-    }
-
-    // const channel = await channelParse(username[2])
-
-    // if (channel.type === 'channel') {
-    //   const symbol = channel.Chat.username.replace(/[_aeiou0-9]/ig, '').substr(0, 5).toUpperCase()
-
-    //   stock = new db.Stock()
-    //   stock.channelId = channel.channel_id
-    //   stock.symbol = symbol
-    //   stock.username = channel.Chat.username
-    //   stock.title = channel.Chat.title
-    //   await stock.save()
+    // return {
+    //   error: 'NOT_FOUND',
     // }
+
+    const channel = await channelParse(username[2])
+
+    if (channel.type === 'channel') {
+      const symbol = channel.Chat.username.replace(/[_aeiou0-9]/ig, '').substr(0, 5).toUpperCase()
+
+      stock = new db.Stock()
+      stock.channelId = channel.channel_id
+      stock.symbol = symbol
+      stock.username = channel.Chat.username
+      stock.title = channel.Chat.title
+      await stock.save()
+    }
   }
 
   return stock

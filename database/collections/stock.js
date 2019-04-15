@@ -24,11 +24,11 @@ const stockSchema = mongoose.Schema({
   title: String,
   available: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   updatable: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   price: Float,
   stats: {
