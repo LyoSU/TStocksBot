@@ -98,6 +98,13 @@ db.Portfolio.getValue = async (tgUser) => {
 db.Portfolio.buy = async (tgUser, peer, basicAmount) => {
   const user = await db.User.get(tgUser)
   const stock = await db.Stock.get(peer)
+
+  if (stock.available === false) {
+    return {
+      error: 'UNAVAILABLE',
+    }
+  }
+
   let amount = basicAmount
 
   if (user.balance <= stock.price * amount) {
@@ -193,13 +200,6 @@ db.Stock.get = async (peer) => {
     //   await stock.save()
     // }
   }
-
-  return stock
-}
-
-
-db.Stock.getTop = async (skip = 0, limit = 10) => {
-  const stock = await db.Stock.find().skip(skip).limit(limit).sort({ price: -1 })
 
   return stock
 }
