@@ -80,6 +80,10 @@ module.exports = async (ctx) => {
             amountTotal += result.amount
             costBasis += result.costBasis * result.amount
           }
+          else if (result.error === 'UNAVAILABLE') {
+            answerText = ctx.i18n.t('stock.answer.buy.error.unavailable')
+            showAlert = true
+          }
           else if (result.error === 'MONEY_ERROR') {
             answerText = ctx.i18n.t('stock.answer.buy.error.money')
             showAlert = true
@@ -135,7 +139,7 @@ module.exports = async (ctx) => {
       })
     }
 
-    const text = ctx.i18n.t('stock.info', {
+    let text = ctx.i18n.t('stock.info', {
       title: stock.title,
       username: stock.username,
       symbol: stock.symbol,
@@ -145,6 +149,9 @@ module.exports = async (ctx) => {
       profitProcent: stock.stats.day.profitProcent.toFixed(2),
       shares,
     })
+
+    if (stock.available === false) text += ctx.i18n.t('stock.error.unavailable')
+    if (stock.updatable === false) text += ctx.i18n.t('stock.error.update_stop')
 
     const markup = Markup.inlineKeyboard([
       [
