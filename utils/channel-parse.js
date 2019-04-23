@@ -28,7 +28,7 @@ module.exports = async (peer) => {
 
   let messages = []
   let fromMessageId = 0
-  let left = 100
+  let left = 70
 
   while (left > 0) {
     const history = await tdlSend('getChatHistory', {
