@@ -4,7 +4,9 @@ const tdl = require('axios').default.create({
 
 
 async function tdlSend(method, parm) {
-  const result = await tdl.post(`/${method}`, parm)
+  const result = await tdl.post(`/${method}`, parm).catch((error) => {
+    console.log(error)
+  })
 
   return result.data
 }
