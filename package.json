@@ -1,6 +1,6 @@
 {
   "name": "tstocksbot",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "description": "@TStocksBot",
   "main": "index.js",
   "scripts": {

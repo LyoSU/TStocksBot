@@ -11,11 +11,15 @@ async function tdlSend(method, parm) {
 
 
 module.exports = async (peer) => {
+  await tdlSend('searchPublicChats', {
+    query: peer,
+  })
+
   const chat = await tdlSend('searchPublicChat', {
     username: peer,
   })
 
-  const chatInfo = await tdlSend('getSupergroupFullInfo', {
+  const chatInfo = await tdlSend('getSupergroup', {
     supergroup_id: chat.type.supergroup_id,
   })
 
