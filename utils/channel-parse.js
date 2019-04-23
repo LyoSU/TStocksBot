@@ -37,9 +37,5 @@ module.exports = async (peer) => {
     messages = messages.concat(history.messages)
   }
 
-  console.log(messages)
-
-  console.log('Время выполнения = ', Date.now() - start);
-
   return { chat, messages }
 }
