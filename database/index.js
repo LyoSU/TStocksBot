@@ -224,7 +224,7 @@ db.Stock.update = async (peer) => {
   const stockPorfolio = await db.Portfolio.getByStockAll(peer)
   const viewsAvg = totalViews / totalMessage
 
-  let price = ((channel.full.participants_count / 25000) * (viewsAvg / 50000)) / 1000
+  let price = ((channel.chat.participants_count / 25000) * (viewsAvg / 50000)) / 1000
 
   if (stockPorfolio.length > 0) {
     let portfolioTotalCost = 0
@@ -238,7 +238,7 @@ db.Stock.update = async (peer) => {
 
   const stock = await db.Stock.get(peer)
 
-  stock.title = channel.Chat.title
+  stock.title = channel.chat.title
 
   if (price < 0 || Number.isNaN(price)) price = 0
   price = parseFloat(price.toFixed(5))
