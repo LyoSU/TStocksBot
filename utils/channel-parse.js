@@ -14,9 +14,9 @@ async function tdlSend(method, parm) {
 
 
 module.exports = async (peer) => {
-  await tdlSend('searchPublicChats', {
-    query: peer,
-  })
+  // await tdlSend('searchPublicChats', {
+  //   query: peer,
+  // })
 
   const chat = await tdlSend('searchPublicChat', {
     username: peer,
