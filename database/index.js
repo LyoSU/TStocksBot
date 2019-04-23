@@ -210,8 +210,6 @@ db.Stock.update = async (peer) => {
   const stock = await db.Stock.get(peer)
   const stockPorfolio = await db.Portfolio.getByStockAll(peer)
 
-  console.log(channel.chatInfo)
-
   if (channel.chatInfo.member_count > 0) {
     let totalMessage = 0
     let totalViews = 0
