@@ -189,14 +189,14 @@ db.Stock.get = async (peer) => {
 
     const channel = await channelParse(username[2])
 
-    if (channel.chat.type.is_channel === true) {
-      const symbol = channel.chatInfo.username.replace(/[_aeiou0-9]/ig, '').substr(0, 5).toUpperCase()
+    if (channel.type === 'channel') {
+      const symbol = channel.Chat.username.replace(/[_aeiou0-9]/ig, '').substr(0, 5).toUpperCase()
 
       stock = new db.Stock()
-      stock.channelId = channel.chatInfo.id
+      stock.channelId = channel.channel_id
       stock.symbol = symbol
-      stock.username = channel.chatInfo.username
-      stock.title = channel.chat.title
+      stock.username = channel.Chat.username
+      stock.title = channel.Chat.title
       await stock.save()
     }
   }
@@ -207,113 +207,111 @@ db.Stock.get = async (peer) => {
 db.Stock.update = async (peer) => {
   const channel = await channelParse(peer)
 
-  const stock = await db.Stock.get(peer)
-  const stockPorfolio = await db.Portfolio.getByStockAll(peer)
+  let totalMessage = 0
+  let totalViews = 0
 
-  if (channel.chatInfo.member_count > 0) {
-    let totalMessage = 0
-    let totalViews = 0
+  const nowUnix = Math.floor(Date.now() / 1000)
 
-    const nowUnix = Math.floor(Date.now() / 1000)
-
-    channel.messages.forEach((message) => {
-      if (!message.fwd_from && message.date < (nowUnix - (3600 * 2)) && totalMessage < 50) {
-        if (message.views) {
-          totalMessage++
-          totalViews += message.views
-        }
+  channel.messages.forEach((message) => {
+    if (!message.fwd_from && message.date < (nowUnix - (3600 * 2)) && totalMessage < 50) {
+      if (message.views) {
+        totalMessage++
+        totalViews += message.views
       }
+    }
+  })
+
+  const stockPorfolio = await db.Portfolio.getByStockAll(peer)
+  const viewsAvg = totalViews / totalMessage
+
+  let price = ((channel.full.participants_count / 25000) * (viewsAvg / 50000)) / 1000
+
+  if (stockPorfolio.length > 0) {
+    let portfolioTotalCost = 0
+
+    stockPorfolio.forEach((share) => {
+      portfolioTotalCost += share.costBasis * share.amount
     })
 
-    const viewsAvg = totalViews / totalMessage
-
-    let price = ((channel.chatInfo.member_count / 25000) * (viewsAvg / 50000)) / 1000
-
-    if (stockPorfolio.length > 0) {
-      let portfolioTotalCost = 0
-
-      stockPorfolio.forEach((share) => {
-        portfolioTotalCost += share.costBasis * share.amount
-      })
-
-      price += ((portfolioTotalCost * (global.gameConfig.sellFee / 100000)) * price)
-    }
-
-    stock.title = channel.chat.title
-
-    if (price < 0 || Number.isNaN(price)) price = 0
-    price = parseFloat(price.toFixed(5))
-
-    if (stock.price !== price) {
-      const history = new db.History()
-
-      history.stock = stock
-      history.price = price
-      await history.save()
-      stock.price = price
-    }
-
-    const now = new Date()
-    const gte = new Date(now - (((24 * 60) * 60) * 1000))
-    const lte = new Date(now)
-
-    const his = await db.History.find({
-      stock: stock.id,
-      time: {
-        $gte: gte,
-        $lte: lte,
-      },
-    }).sort({ time: 1 })
-
-    if (his.length > 1) {
-      const labels = []
-      const data = []
-
-      his.forEach((h) => {
-        labels.push(dateFormat(h.time, 'H:MM'))
-        data.push(h.price)
-      })
-
-      const canvasRenderService = new CanvasRenderService(1200, 600)
-
-      const configuration = {
-        backgroundColor: 'rgba(48, 160, 214, 1)',
-        type: 'line',
-        data: {
-          labels,
-          datasets: [{
-            data,
-            backgroundColor: 'rgba(48, 160, 214, 0.2)',
-            borderColor: 'rgba(48, 160, 214, 1)',
-          }],
-        },
-        options: {
-          title: {
-            display: true,
-            fontSize: 25,
-            fontColor: 'rgba(48, 160, 214, 1)',
-            text: stock.symbol,
-          },
-          legend: {
-            display: false,
-          },
-        },
-      }
-
-      const image = await canvasRenderService.renderToBuffer(configuration)
-      const upload = await uploadFile(image)
-
-      const costBasis = his[0].price
-      const profitMoney = price - costBasis
-      const profitProcent = (profitMoney / costBasis) * 100
-
-      stock.stats.day.chart = `telegra.ph${upload[0].src}`
-      stock.stats.day.profitMoney = profitMoney
-      stock.stats.day.profitProcent = profitProcent
-    }
-
-    await stock.save()
+    price += ((portfolioTotalCost * (global.gameConfig.sellFee / 100000)) * price)
   }
+
+  const stock = await db.Stock.get(peer)
+
+  stock.title = channel.Chat.title
+
+  if (price < 0 || Number.isNaN(price)) price = 0
+  price = parseFloat(price.toFixed(5))
+
+  if (stock.price !== price) {
+    const history = new db.History()
+
+    history.stock = stock
+    history.price = price
+    await history.save()
+    stock.price = price
+  }
+
+  const now = new Date()
+  const gte = new Date(now - (((24 * 60) * 60) * 1000))
+  const lte = new Date(now)
+
+  const his = await db.History.find({
+    stock: stock.id,
+    time: {
+      $gte: gte,
+      $lte: lte,
+    },
+  }).sort({ time: 1 })
+
+  if (his.length > 1) {
+    const labels = []
+    const data = []
+
+    his.forEach((h) => {
+      labels.push(dateFormat(h.time, 'H:MM'))
+      data.push(h.price)
+    })
+
+    const canvasRenderService = new CanvasRenderService(1200, 600)
+
+    const configuration = {
+      backgroundColor: 'rgba(48, 160, 214, 1)',
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: 'rgba(48, 160, 214, 0.2)',
+          borderColor: 'rgba(48, 160, 214, 1)',
+        }],
+      },
+      options: {
+        title: {
+          display: true,
+          fontSize: 25,
+          fontColor: 'rgba(48, 160, 214, 1)',
+          text: stock.symbol,
+        },
+        legend: {
+          display: false,
+        },
+      },
+    }
+
+    const image = await canvasRenderService.renderToBuffer(configuration)
+    const upload = await uploadFile(image)
+
+    const costBasis = his[0].price
+    const profitMoney = price - costBasis
+    const profitProcent = (profitMoney / costBasis) * 100
+
+    stock.stats.day.chart = `telegra.ph${upload[0].src}`
+    stock.stats.day.profitMoney = profitMoney
+    stock.stats.day.profitProcent = profitProcent
+  }
+
+  await stock.save()
 
   return stock
 }
