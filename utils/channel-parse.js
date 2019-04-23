@@ -8,7 +8,7 @@ async function tdlSend(method, parm) {
     console.log(error)
   })
 
-  if (result.data) return result.data
+  if (result) return result.data
   return {}
 }
 
