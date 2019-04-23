@@ -5,7 +5,7 @@ const tdl = require('axios').default.create({
 
 async function tdlSend(method, parm) {
   const result = await tdl.post(`/${method}`, parm).catch((error) => {
-    console.log('error')
+    console.log('tdl error')
   })
 
   if (result) return result.data
@@ -28,14 +28,14 @@ module.exports = async (peer) => {
 
   let messages = []
   let fromMessageId = 0
-  let left = 100
+  let left = 70
 
   while (left > 0) {
     const history = await tdlSend('getChatHistory', {
       chat_id: chat.id,
       from_message_id: fromMessageId,
       offset: 0,
-      limit: 100,
+      limit: 10,
     })
 
     if (history.messages.length === 0) break
