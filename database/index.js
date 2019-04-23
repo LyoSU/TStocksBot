@@ -224,7 +224,9 @@ db.Stock.update = async (peer) => {
   const stockPorfolio = await db.Portfolio.getByStockAll(peer)
   const viewsAvg = totalViews / totalMessage
 
-  let price = ((channel.chat.participants_count / 25000) * (viewsAvg / 50000)) / 1000
+  console.log(channel.chat)
+
+  let price = ((channel.chatInfo.member_count / 25000) * (viewsAvg / 50000)) / 1000
 
   if (stockPorfolio.length > 0) {
     let portfolioTotalCost = 0

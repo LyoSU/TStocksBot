@@ -11,10 +11,12 @@ async function tdlSend(method, parm) {
 
 
 module.exports = async (peer) => {
-  const start = Date.now()
-
   const chat = await tdlSend('searchPublicChat', {
     username: peer,
+  })
+
+  const chatInfo = await tdlSend('getSupergroupFullInfo', {
+    supergroup_id: chat.type.supergroup_id,
   })
 
   let messages = []
@@ -37,5 +39,5 @@ module.exports = async (peer) => {
     messages = messages.concat(history.messages)
   }
 
-  return { chat, messages }
+  return { chat, chatInfo, messages }
 }
