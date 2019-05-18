@@ -303,12 +303,12 @@ db.Stock.update = async (peer) => {
     const upload = await uploadFile(image)
 
     if (upload.error) console.error(upload)
+    else stock.stats.day.chart = `telegra.ph${upload[0].src}`
 
     const costBasis = his[0].price
     const profitMoney = price - costBasis
     const profitProcent = (profitMoney / costBasis) * 100
 
-    stock.stats.day.chart = `telegra.ph${upload[0].src}`
     stock.stats.day.profitMoney = profitMoney
     stock.stats.day.profitProcent = profitProcent
   }
