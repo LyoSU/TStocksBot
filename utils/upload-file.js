@@ -5,7 +5,7 @@ module.exports = async (file) => {
   const form = new FormData()
 
   form.append('data', file, {
-    filename: 'file',
+    // filename: 'file',
   })
   return new Promise((resolve, reject) => {
     form.submit('https://telegra.ph/upload', (err, res) => {

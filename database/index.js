@@ -4,7 +4,7 @@ const {
 } = require.main.require('./utils')
 const dateFormat = require('dateformat')
 const { CanvasRenderService } = require('chartjs-node-canvas')
-const collections = require('./collections')
+const collections = require('./models')
 const connection = require('./connection')
 
 
@@ -212,6 +212,8 @@ db.Stock.update = async (peer) => {
 
   const nowUnix = Math.floor(Date.now() / 1000)
 
+  console.log(channel)
+
   channel.messages.forEach((message) => {
     if (!message.fwd_from && message.date < (nowUnix - (3600 * 2)) && totalMessage < 50) {
       if (message.views) {
@@ -301,6 +303,8 @@ db.Stock.update = async (peer) => {
 
     const image = await canvasRenderService.renderToBuffer(configuration)
     const upload = await uploadFile(image)
+
+    if (upload.error) console.error(upload)
 
     const costBasis = his[0].price
     const profitMoney = price - costBasis
