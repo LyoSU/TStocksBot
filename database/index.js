@@ -4,7 +4,7 @@ const {
 } = require.main.require('./utils')
 const dateFormat = require('dateformat')
 const { CanvasRenderService } = require('chartjs-node-canvas')
-const collections = require('./collections')
+const collections = require('./models')
 const connection = require('./connection')
 
 
@@ -301,6 +301,8 @@ db.Stock.update = async (peer) => {
 
     const image = await canvasRenderService.renderToBuffer(configuration)
     const upload = await uploadFile(image)
+
+    if (upload.error) console.error(upload)
 
     const costBasis = his[0].price
     const profitMoney = price - costBasis
