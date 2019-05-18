@@ -302,7 +302,7 @@ db.Stock.update = async (peer) => {
     const image = await canvasRenderService.renderToBuffer(configuration)
     const upload = await uploadFile(image)
 
-    if (upload.error) console.error(upload)
+    if (upload.error) console.error('telegra.ph:', upload)
     else stock.stats.day.chart = `telegra.ph${upload[0].src}`
 
     const costBasis = his[0].price
