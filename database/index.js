@@ -212,8 +212,6 @@ db.Stock.update = async (peer) => {
 
   const nowUnix = Math.floor(Date.now() / 1000)
 
-  console.log(channel)
-
   channel.messages.forEach((message) => {
     if (!message.fwd_from && message.date < (nowUnix - (3600 * 2)) && totalMessage < 50) {
       if (message.views) {
