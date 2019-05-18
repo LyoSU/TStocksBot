@@ -177,7 +177,7 @@ module.exports = async (ctx) => {
         reply_markup: markup,
       }).catch((error) => {
         if (error.description === 'Bad Request: message is not modified') return ''
-        return console.log('Ooops', error)
+        // return console.log('Ooops', error)
       })
 
       ctx.answerCbQuery(answerText, showAlert)
