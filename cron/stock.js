@@ -16,7 +16,7 @@ module.exports = async () => {
       await setTimeout(async () => {
         console.log(`cron update stock ${stock.username}`)
         await db.Stock.update(stock.username)
-      }, (1000 * 3))
+      }, (1000 * 10))
     }
   }))
 
