@@ -1,9 +1,9 @@
 const {
   channelParse,
   uploadFile,
+  chartGenerate,
 } = require.main.require('./utils')
 const dateFormat = require('dateformat')
-const { CanvasRenderService } = require('chartjs-node-canvas')
 const collections = require('./models')
 const connection = require('./connection')
 
@@ -273,33 +273,7 @@ db.Stock.update = async (peer) => {
       data.push(h.price)
     })
 
-    const canvasRenderService = new CanvasRenderService(1200, 600)
-
-    const configuration = {
-      backgroundColor: 'rgba(48, 160, 214, 1)',
-      type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          data,
-          backgroundColor: 'rgba(48, 160, 214, 0.2)',
-          borderColor: 'rgba(48, 160, 214, 1)',
-        }],
-      },
-      options: {
-        title: {
-          display: true,
-          fontSize: 25,
-          fontColor: 'rgba(48, 160, 214, 1)',
-          text: stock.symbol,
-        },
-        legend: {
-          display: false,
-        },
-      },
-    }
-
-    const image = await canvasRenderService.renderToBuffer(configuration)
+    const image = await chartGenerate(stock.symbol, data, labels)
     const upload = await uploadFile(image)
 
     if (upload.error) console.error('telegra.ph:', upload)
