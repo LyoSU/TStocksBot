@@ -1,5 +1,5 @@
 const parser = require('axios').default.create({
-  baseURL: 'https://sw.lyo.su/channel',
+  baseURL: 'https://bot.lyo.su/channel',
 })
 
 
