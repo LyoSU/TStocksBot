@@ -21,10 +21,6 @@ const {
 const cron = require('./cron')
 
 
-const {
-  match,
-} = I18n
-
 global.gameConfig = {
   sellFee: 0.15,
 }
@@ -48,17 +44,13 @@ bot.use(session)
 bot.context.redis = redis
 bot.context.db = db
 
+const { match } = I18n
 const i18n = new I18n({
   directory: path.resolve(__dirname, 'locales'),
   defaultLanguage: 'ru',
 })
 
 bot.use(i18n.middleware())
-
-const moneyLimitConfig = rateLimit({
-  window: 1000,
-  limit: 1,
-})
 
 bot.use(async (ctx, next) => {
   ctx.ms = new Date()
@@ -76,7 +68,7 @@ bot.hears((['/top', match('profile.btn.top')]), handleTop)
 
 bot.hears(/(?:\$(\w{2,32})|(?:(?:t\.me)\/|(\/s_|@))(\w{2,32}))/, handleStock)
 
-bot.action(/stock:(.*)/, rateLimit(moneyLimitConfig), handleStock)
+bot.action(/stock:(.*)/, rateLimit({ window: 100, limit: 1 }), handleStock)
 
 bot.on('text', handleHelp)
 
