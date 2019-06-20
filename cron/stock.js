@@ -13,10 +13,8 @@ module.exports = async () => {
     for (let index = 0; index < stocks.length; index++) {
       const stock = stocks[index]
 
-      await setTimeout(() => {
-        console.log(`cron update stock ${stock.username}`)
-        db.Stock.update(stock.username)
-      }, (1000 * 5))
+      console.log(`cron update stock ${stock.username}`)
+      await db.Stock.update(stock.username)
     }
   }))
 
