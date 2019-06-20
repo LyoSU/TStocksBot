@@ -7,16 +7,16 @@ const {
 db.Stock.update('telegram')
 
 module.exports = async () => {
-  const job = new CronJob('0 */10 * * * *', (async () => {
+  const job = new CronJob('0 */5 * * * *', (async () => {
     const stocks = await db.Stock.find({ updatable: true })
 
     for (let index = 0; index < stocks.length; index++) {
       const stock = stocks[index]
 
-      await setTimeout(async () => {
+      await setTimeout(() => {
         console.log(`cron update stock ${stock.username}`)
-        await db.Stock.update(stock.username)
-      }, (1000 * 15))
+        db.Stock.update(stock.username)
+      }, (1000 * 5))
     }
   }))
 
