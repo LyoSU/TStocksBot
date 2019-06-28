@@ -1,6 +1,6 @@
 {
   "name": "tstocksbot",
-  "version": "0.5.12",
+  "version": "0.5.13",
   "description": "@TStocksBot",
   "main": "index.js",
   "scripts": {
@@ -19,7 +19,7 @@
   },
   "homepage": "https://t.me/TStocksBot",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.19.0",
     "chart.js": "^2.7.3",
     "chartjs-node-canvas": "^2.2.4",
     "cheerio": "^1.0.0-rc.2",
