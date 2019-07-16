@@ -1,0 +1,94 @@
+help:
+  info: |
+    <b>TStocks'a hoş geldiniz!</b>
+    Bu, “hisse senetlerinin” Telegram kanalları olduğu borsadaki bir oyundur.
+    En sevdiğiniz kanalların hisselerini alıp satın.
+    Tüm para sanal ve ekonomi gerçektir. Fiyat; abone sayısına, ortalama görüntülenme sayısına ve sizin gibi aynı oyunculardan gelen gerçek alım satıma (alış ve satış) bağlıdır.
+    Kanala bir bot bağlantısı gönderin veya bu konuyla ilgili bilgileri görüntülemek için üstte bulun ve hisseleri satın alın.
+    Bot en iyi kanalların istatistiklerini işler; eğer istediğiniz kanal yoksa, bizim gereksinimlerimizi karşılamadığı veya yakın gelecekte ekleneceği anlamına gelir.
+    <i>Botun Telegram ve kanal yazarlarıyla hiçbir ilgisi yoktur. Oyundaki tüm paralar sanaldır ve gerçek ile ilgisi imkansızdır.</i>
+profile:
+  info: |
+    👤 <b>İsim:</b> ${name}
+    🏦 <b>Bakiye:</b> ${balance}💲
+    💼 <b>Portföy</b>
+      Miktar: ${shares}
+      Değer: ${costBasis}💲 > ${cost}💲
+      Kar/Zarar: ${profitMoney}💲 (${profitProcent}%)
+    💰 Sermaye: ${capital}💲
+    📅 <b>Hesap yaşı:</b> ${accountAge}
+  btn:
+    profile: 👤 Profil
+    portfolio: 💼 Portföy
+    channels: 📢 Kanallar
+    top: 🏆 En iyi
+stock:
+  info: |
+    <a href="${chart}">&#8203;</a><b>${title}</b> (@${username})
+    <b>Sembol:</b> $${symbol}
+    <b>Fiyat:</b> ${price}💲
+      Günlük: ${profitMoney}💲 (${profitProcent}%)
+    ${shares}
+  shares: |
+    <b>Hisseler:</b>
+      Miktar: ${shares}
+      Değer: ${costBasis}💲 > ${cost}💲
+      Kar/Zarar: ${profitMoney}💲 (${profitProcent}%)
+  btn:
+    update: Güncelle
+    buy: Satın al
+    sell: Sat
+  answer:
+    update:
+      suc: Güncellendi
+    buy:
+      suc: Başarıyla bir hisse aldınız $${symbol} (${amount})
+      error:
+        unavailable: Bu kanalın hisselerinin alım/satımı askıya alındı!
+        money: |
+          Hata!
+          Bir alım yapmak için yeterli paranız yok
+    sell:
+      suc: Hisseyi başarıyla sattınız $${symbol} (${amount})
+      error:
+        not_found: |
+          Hata!
+          Bu kanalda hiç hisseniz yok
+  error:
+    unavailable: \n🚫 <b>Dikkat!</b> Bu kanalın hisselerinin alım/satımı askıya alındı!
+    update_stop: \n🛑 Bu kanal için istatistik güncellemeleri askıya alındı.
+    no_shares: |
+      <i>Bu kanalda hiç hisseniz yok</i>
+    small: |
+      <b>Hata!</b>
+      Kanal çok küçük
+    not_found: |
+      <b>Hata!</b>
+      Kanal bulunamadı
+portfolio:
+  info: |
+    💼 <b>Portföy ${name}</b>
+    ${portfolioText}
+  stock:
+    \n/s_${symbol} - ${costBasis}💲 > ${cost}💲 <i>${profitProcent}%</i>
+  error:
+    empty: |
+      <b>Boş!</b>
+      ☹️ Herhangi bir hisseye sahip değilsiniz
+channels:
+  info: |
+    <b>En iyi kanallar:</b>
+    ${channelsText}
+  stock:
+    \n${num}/s_${symbol} - ${price}💲 <i>${profitProcent}%</i>
+top:
+  info: |
+    <b>En iyi oyuncular:</b>
+    ${topText}
+  user:
+    \n${num}${name} - ${capital}💲
+  error:
+    empty:
+      Çok az oyuncu var veya en iyiler henüz şekillenmedi...
+error:
+  unknown: Bilinmeyen hata
