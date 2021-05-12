@@ -20,7 +20,7 @@
   "homepage": "https://t.me/TStocksBot",
   "dependencies": {
     "axios": "^0.19.0",
-    "chart.js": "^2.7.3",
+    "chart.js": "^2.9.4",
     "chartjs-node-canvas": "^2.2.4",
     "cheerio": "^1.0.0-rc.2",
     "cron": "^1.6.0",
